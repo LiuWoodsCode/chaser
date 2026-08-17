@@ -13,8 +13,9 @@ class NexradRenderData {
     static let zoomToHideMiscFeatures: Float = 0.2
     #endif
 
+    let useMapKitBaseLayer: Bool
     var radarLayers = [MetalBuffers]()
-    var radarBuffers = MetalRadarBuffers(RadarPreferences.nexradRadarBackgroundColor)
+    var radarBuffers: MetalRadarBuffers
     var geographicBuffers = [MetalBuffers]()
     var stateLineBuffers = MetalBuffers(GeographyType.stateLines, 0.0)
     var mxLineBuffers = MetalBuffers(GeographyType.mxLines, 0.0)
@@ -55,16 +56,20 @@ class NexradRenderData {
     var wpcFrontBuffersList = [MetalBuffers]()
     var wpcFrontPaints = [Int]()
 
-    init() {
+    init(useMapKitBaseLayer: Bool = false) {
+        self.useMapKitBaseLayer = useMapKitBaseLayer
+        radarBuffers = MetalRadarBuffers(RadarPreferences.nexradRadarBackgroundColor, useMapKitBaseLayer: useMapKitBaseLayer)
         radarLayers = [radarBuffers]
-        [countyLineBuffers, stateLineBuffers, caLineBuffers, mxLineBuffers, hwBuffers, hwExtBuffers, lakeBuffers].forEach {
-            if $0.geoType.display {
-                geographicBuffers.append($0)
+        if !useMapKitBaseLayer {
+            [countyLineBuffers, stateLineBuffers, caLineBuffers, mxLineBuffers, hwBuffers, hwExtBuffers, lakeBuffers].forEach {
+                if $0.geoType.display {
+                    geographicBuffers.append($0)
+                }
             }
-        }
-        [countyLineBuffers, stateLineBuffers, caLineBuffers, mxLineBuffers, hwBuffers, hwExtBuffers, lakeBuffers].forEach {
-            if $0.geoType.display {
-                radarLayers.append($0)
+            [countyLineBuffers, stateLineBuffers, caLineBuffers, mxLineBuffers, hwBuffers, hwExtBuffers, lakeBuffers].forEach {
+                if $0.geoType.display {
+                    radarLayers.append($0)
+                }
             }
         }
     }
@@ -80,7 +85,7 @@ class NexradRenderData {
         radarBuffers.levelData.binWord = MemoryBuffer()
         radarBuffers.levelData = NexradLevelData()
         radarBuffers.metalBuffer.removeAll()
-        radarBuffers = MetalRadarBuffers(RadarPreferences.nexradRadarBackgroundColor)
+        radarBuffers = MetalRadarBuffers(RadarPreferences.nexradRadarBackgroundColor, useMapKitBaseLayer: useMapKitBaseLayer)
     }
 
     func addToLayers() {

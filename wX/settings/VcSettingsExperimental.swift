@@ -8,6 +8,8 @@ import UIKit
 
 final class VcSettingsExperimental: UIwXViewController {
 
+    private var switches = [Switch]()
+
     override func viewDidLoad() {
         super.viewDidLoad()
         toolbar.items = ToolbarItems(doneButton, GlobalVariables.flexBarButton).items
@@ -22,11 +24,15 @@ final class VcSettingsExperimental: UIwXViewController {
     }
 
     private func display() {
-        let text = Text(
-            boxMain,
-            "No experimental settings yet.",
-            FontSize.large.size
-        )
-        text.isSelectable = false
+        switches.removeAll()
+        switches.append(Switch(boxMain, "NEXRAD_USE_MAPKIT_BASE_LAYER", "NEXRAD radar uses MapKit base layer", "false"))
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            self.boxMain.removeChildren()
+            self.display()
+        }
     }
 }
