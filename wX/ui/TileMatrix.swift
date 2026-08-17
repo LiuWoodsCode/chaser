@@ -28,22 +28,13 @@ final class TileMatrix {
         menuButton = ToolbarIcon(uiv, .submenu, #selector(menuClicked))
         menuButton.setMenu(Route.subMenu(uiv))
         let dashButton = ToolbarIcon(uiv, .severeDashboard, #selector(dashClicked))
-        if UIPreferences.mainScreenRadarFab {
-            toolbar.items = ToolbarItems(
-                GlobalVariables.flexBarButton,
-                dashButton,
-                wfoTextButton,
-                cloudButton,
-                menuButton).items
-        } else {
-            toolbar.items = ToolbarItems(
-                GlobalVariables.flexBarButton,
-                dashButton,
-                wfoTextButton,
-                cloudButton,
-                radarButton,
-                menuButton).items
-        }
+        toolbar.items = ToolbarItems(
+            GlobalVariables.flexBarButton,
+            dashButton,
+            wfoTextButton,
+            cloudButton,
+            radarButton,
+            menuButton).items
         uiv.view.addSubview(toolbar)
         toolbar.setConfigWithUiv(uiv, toolbarType: .top)
         #endif

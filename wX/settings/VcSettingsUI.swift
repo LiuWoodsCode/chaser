@@ -49,7 +49,6 @@ final class VcSettingsUI: UIwXViewController {
         switches.append(Switch(boxMain, "HOURLY_SHOW_AM_PM", "Hourly/Nexrad: show with AM/PM", "false"))
         switches.append(Switch(boxMain, "SCREEN_ON_FOR_TTS", "Keep screen on for TTS", "false"))
         switches.append(Switch(boxMain, "DUALPANE_RADAR_ICON", "Lightning button opens dual pane radar", "false"))
-        switches.append(Switch(boxMain, "UI_MAIN_SCREEN_RADAR_FAB", "Main screen radar button (requires restart)", "true"))
         switches.append(Switch(boxMain, "RADAR_TOOLBAR_TRANSPARENT", "Radar uses transparent toolbars", "true"))
         switches.append(Switch(boxMain, "UI_MAIN_SCREEN_CONDENSE", "Show less information on main screen", "false"))
         switches.append(Switch(boxMain, "SETTINGS_TOGGLE_ON_RIGHT_SIDE", "Settings - toggle is on right side", "true"))

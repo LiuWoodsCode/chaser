@@ -107,18 +107,15 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
     }
 
     func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
-        var identifiers: [NSToolbarItem.Identifier] = [
+        [
             Identifier.tabs,
             .flexibleSpace,
             Identifier.dashboard,
             Identifier.wfoText,
-            Identifier.clouds
+            Identifier.clouds,
+            Identifier.radar,
+            Identifier.more
         ]
-        if !UIPreferences.mainScreenRadarFab {
-            identifiers.append(Identifier.radar)
-        }
-        identifiers.append(Identifier.more)
-        return identifiers
     }
 
     func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {

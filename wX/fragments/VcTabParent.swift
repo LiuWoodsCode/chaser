@@ -11,7 +11,6 @@ class VcTabParent: UIViewController {
     var scrollView = UIScrollView()
     var boxMain = HBox(.fill)
     var objTileMatrix = TileMatrix()
-    var fab: Fab?
     var objScrollStackView: ScrollStackView?
 
     override func viewDidLoad() {
@@ -31,9 +30,6 @@ class VcTabParent: UIViewController {
         view.addGestureRecognizer(rightSwipe)
         setTabBarColor()
         objScrollStackView = ScrollStackView(self, scrollView, boxMain.get())
-        if UIPreferences.mainScreenRadarFab {
-            fab = Fab(self, #selector(radarClicked))
-        }
     }
 
     func setTabBarColor() {
@@ -117,9 +113,6 @@ class VcTabParent: UIViewController {
         scrollView = UIScrollView()
         boxMain = HBox(.fill)
         objScrollStackView = ScrollStackView(self, scrollView, boxMain.get())
-        if UIPreferences.mainScreenRadarFab {
-            fab = Fab(self, #selector(radarClicked))
-        }
     }
 
     func removeAllViews() {
@@ -141,9 +134,6 @@ class VcTabParent: UIViewController {
     func updateColors() {
         setTabBarColor()
         view.backgroundColor = AppColors.primaryBackgroundBlueUIColor
-        if UIPreferences.mainScreenRadarFab {
-            fab?.setColor()
-        }
     }
 
     @objc func willEnterForeground() {

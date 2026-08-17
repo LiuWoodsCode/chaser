@@ -25,7 +25,6 @@ final class UIPreferences {
     static var tilesPerRow = 3
     static var homescreenTextLength = 500
     static var radarToolbarTransparent = true
-    static var mainScreenRadarFab = true
     static var mainScreenCondense = false
     static var nwsIconSize: Float = 80.0
     static var goesUseFullResolutionImages = false
@@ -58,7 +57,6 @@ final class UIPreferences {
         refreshLocMin = Utility.readPrefInt("REFRESH_LOC_MIN", 10)
         textviewFontSize = CGFloat(Utility.readPrefInt("TEXTVIEW_FONT_SIZE", Int(textviewFontSize)))
         radarToolbarTransparent = Utility.readPref("RADAR_TOOLBAR_TRANSPARENT", "true").hasPrefix("t")
-        mainScreenRadarFab = Utility.readPref("UI_MAIN_SCREEN_RADAR_FAB", "true").hasPrefix("t")
         mainScreenCondense = Utility.readPref("UI_MAIN_SCREEN_CONDENSE", "false").hasPrefix("t")
         nwsIconSize = Utility.readPrefFloat("NWS_ICON_SIZE_PREF", 68.0)
         animInterval = Utility.readPrefInt("ANIM_INTERVAL", 6)

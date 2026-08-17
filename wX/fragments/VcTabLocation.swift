@@ -54,7 +54,6 @@ final class VcTabLocation: VcTabParent {
         #else
         toolbar.resize(uiv: self)
         #endif
-        fab?.resize()
         let topSpace: CGFloat
         #if targetEnvironment(macCatalyst)
         topSpace = UtilityUI.getTopPadding()
@@ -128,22 +127,13 @@ final class VcTabLocation: VcTabParent {
         menuButton = ToolbarIcon(self, .submenu, #selector(menuClicked))
         menuButton.setMenu(Route.subMenu(self))
         let dashButton = ToolbarIcon(self, .severeDashboard, #selector(dashClicked))
-        if UIPreferences.mainScreenRadarFab {
-            toolbar.items = ToolbarItems(
-                GlobalVariables.flexBarButton,
-                dashButton,
-                wfoTextButton,
-                cloudButton,
-                menuButton).items
-        } else {
-            toolbar.items = ToolbarItems(
-                GlobalVariables.flexBarButton,
-                dashButton,
-                wfoTextButton,
-                cloudButton,
-                radarButton,
-                menuButton).items
-        }
+        toolbar.items = ToolbarItems(
+            GlobalVariables.flexBarButton,
+            dashButton,
+            wfoTextButton,
+            cloudButton,
+            radarButton,
+            menuButton).items
         view.addSubview(toolbar)
         toolbar.setConfigWithUiv(self, toolbarType: .top)
         #endif
@@ -163,9 +153,6 @@ final class VcTabLocation: VcTabParent {
         }, { self.getCurrentConditionCards() })
         _ = FutureVoid(downloadSevenDay, updateSevenDay)
         _ = FutureVoid(downloadHazards, updateHazards)
-        if fab != nil {
-            view.bringSubviewToFront(fab!.getView())
-        }
     }
 
     func downloadSevenDay() {
@@ -408,8 +395,5 @@ final class VcTabLocation: VcTabParent {
         locationLabel.color = ColorCompatibility.highlightText
         view.backgroundColor = AppColors.primaryBackgroundBlueUIColor
         setTabBarColor()
-        if UIPreferences.mainScreenRadarFab {
-            fab?.setColor()
-        }
     }
 }
