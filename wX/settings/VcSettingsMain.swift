@@ -14,6 +14,7 @@ final class VcSettingsMain: UIwXViewController {
         "Radar",
         "Home Screen",
         "User Interface",
+        "Experimental",
         "Celsius to Fahrenheit table",
         "Spotters",
         "About " + GlobalVariables.appName
@@ -40,6 +41,8 @@ final class VcSettingsMain: UIwXViewController {
             Route.settingsRadar(self)
         case "User Interface":
             Route.settingsUI(self)
+        case "Experimental":
+            Route.settingsExperimental(self)
         case "Colors":
             Route.settingsColors(self)
         case "Home Screen":

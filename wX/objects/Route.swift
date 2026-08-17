@@ -243,6 +243,10 @@ final class Route {
         uiv.goToVC(VcSettingsColorListing())
     }
 
+    static func settingsExperimental(_ uiv: UIViewController) {
+        uiv.goToVC(VcSettingsExperimental())
+    }
+
     static func settingsHomeScreen(_ uiv: UIViewController) {
         uiv.goToVC(VcSettingsHomescreen())
     }

@@ -283,6 +283,7 @@
 		03FA10051FD0BE4500FD96C8 /* CardHazard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FA10041FD0BE4500FD96C8 /* CardHazard.swift */; };
 		03FF8F7E21FA72CD00661F78 /* CardSpotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */; };
 		03FF8F7F21FA72CD00661F78 /* CardSpotterReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */; };
+		97943EC030336E6300BE3934 /* VcSettingsExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */; };
 		F00399C41DE9F7D6004508FE /* NexradLevel3WindBarbs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */; };
 		F011E61D1DB04E38006531FD /* CustomTabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011E61C1DB04E38006531FD /* CustomTabBarVC.swift */; };
 		F0149B4E1E5BA72900418162 /* ObjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0149B4D1E5BA72900418162 /* ObjectModel.swift */; };
@@ -692,6 +693,7 @@
 		03FA10041FD0BE4500FD96C8 /* CardHazard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardHazard.swift; sourceTree = "<group>"; };
 		03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotter.swift; sourceTree = "<group>"; };
 		03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotterReport.swift; sourceTree = "<group>"; };
+		97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VcSettingsExperimental.swift; sourceTree = "<group>"; };
 		F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NexradLevel3WindBarbs.swift; sourceTree = "<group>"; };
 		F011E61C1DB04E38006531FD /* CustomTabBarVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabBarVC.swift; sourceTree = "<group>"; };
 		F0149B4D1E5BA72900418162 /* ObjectModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectModel.swift; sourceTree = "<group>"; };
@@ -1114,6 +1116,7 @@
 				034041FD23F16A4D003AB242 /* VcSettingsMain.swift */,
 				034041FC23F16A4D003AB242 /* VcSettingsRadar.swift */,
 				0340420823F16ACA003AB242 /* VcSettingsUI.swift */,
+				97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */,
 			);
 			path = settings;
 			sourceTree = "<group>";
@@ -1922,6 +1925,7 @@
 				F064D1401DB6EBA6003C04FB /* ExternalLine.swift in Sources */,
 				0354D3F623C117710024153D /* Fronts.swift in Sources */,
 				036522B422914AD90056E657 /* UtilityWpcText.swift in Sources */,
+				97943EC030336E6300BE3934 /* VcSettingsExperimental.swift in Sources */,
 				03BF51D02B44E73900164F31 /* UISpotters.swift in Sources */,
 				03EE27DD2B43102B00AE802E /* AppColors.swift in Sources */,
 				031E56BF2E848C9D003F931F /* Box.swift in Sources */,
