@@ -140,21 +140,33 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
         case Identifier.tabs:
             return makeTabItem()
         case Identifier.dashboard:
-            return makeActionItem(itemIdentifier, title: "Severe Dashboard", systemImageName: "exclamationmark.shield.fill") { controller in
-                Route.severeDashboard(controller)
-            }
+            return makeActionItem(
+                itemIdentifier,
+                title: "Severe Dashboard",
+                systemImageName: "exclamationmark.shield.fill",
+                action: #selector(showSevereDashboard(_:))
+            )
         case Identifier.wfoText:
-            return makeActionItem(itemIdentifier, title: "WFO Text", systemImageName: "doc.circle.fill") { controller in
-                Route.wfoText(controller)
-            }
+            return makeActionItem(
+                itemIdentifier,
+                title: "WFO Text",
+                systemImageName: "doc.circle.fill",
+                action: #selector(showWfoText(_:))
+            )
         case Identifier.clouds:
-            return makeActionItem(itemIdentifier, title: "Clouds", systemImageName: "cloud.fill") { controller in
-                Route.goes(controller)
-            }
+            return makeActionItem(
+                itemIdentifier,
+                title: "Clouds",
+                systemImageName: "cloud.fill",
+                action: #selector(showClouds(_:))
+            )
         case Identifier.radar:
-            return makeActionItem(itemIdentifier, title: "Radar", systemImageName: "bolt.fill") { controller in
-                Route.radarFromMainScreen(controller)
-            }
+            return makeActionItem(
+                itemIdentifier,
+                title: "Radar",
+                systemImageName: "bolt.fill",
+                action: #selector(showRadar(_:))
+            )
         case Identifier.more:
             return makeMoreItem(itemIdentifier)
         default:
@@ -183,17 +195,15 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
         _ itemIdentifier: NSToolbarItem.Identifier,
         title: String,
         systemImageName: String,
-        handler: @escaping (UIViewController) -> Void
+        action: Selector
     ) -> NSToolbarItem {
         let image = UIImage(systemName: systemImageName)
-        let action = UIAction(title: title, image: image) { [weak self] _ in
-            guard let controller = self?.activeController else { return }
-            handler(controller)
-        }
-        let barButtonItem = UIBarButtonItem(title: nil, image: image, primaryAction: action, menu: nil)
+        let barButtonItem = UIBarButtonItem(image: image, style: .plain, target: self, action: action)
         barButtonItem.accessibilityLabel = title
 
         let item = NSToolbarItem(itemIdentifier: itemIdentifier, barButtonItem: barButtonItem)
+        item.target = self
+        item.action = action
         item.label = title
         item.paletteLabel = title
         item.toolTip = title
@@ -203,11 +213,12 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
 
     private func makeMoreItem(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem {
         let image = UIImage(systemName: "ellipsis")
+        let menu = Route.subMenu { [weak self] in self?.activeController }
         let barButtonItem = UIBarButtonItem(
             title: nil,
             image: image,
             primaryAction: nil,
-            menu: Route.subMenu { [weak self] in self?.activeController }
+            menu: menu
         )
         barButtonItem.accessibilityLabel = "More"
 
@@ -216,12 +227,33 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
         item.paletteLabel = "More"
         item.toolTip = "More"
         item.visibilityPriority = .high
+        item.itemMenuFormRepresentation = menu
         return item
     }
 
     private var activeController: UIViewController? {
         guard let tabBarController else { return nil }
         return tabBarController.selectedViewController ?? tabBarController
+    }
+
+    @objc private func showSevereDashboard(_ sender: Any?) {
+        guard let activeController else { return }
+        Route.severeDashboard(activeController)
+    }
+
+    @objc private func showWfoText(_ sender: Any?) {
+        guard let activeController else { return }
+        Route.wfoText(activeController)
+    }
+
+    @objc private func showClouds(_ sender: Any?) {
+        guard let activeController else { return }
+        Route.goes(activeController)
+    }
+
+    @objc private func showRadar(_ sender: Any?) {
+        guard let activeController else { return }
+        Route.radarFromMainScreen(activeController)
     }
 
     @objc private func tabChanged(_ sender: NSToolbarItemGroup) {
