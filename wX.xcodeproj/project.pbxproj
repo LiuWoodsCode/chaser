@@ -284,6 +284,7 @@
 		03FF8F7E21FA72CD00661F78 /* CardSpotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */; };
 		03FF8F7F21FA72CD00661F78 /* CardSpotterReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */; };
 		97943EC030336E6300BE3934 /* VcSettingsExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */; };
+		97943EC23033740B00BE3934 /* NexradMapKitBaseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97943EC13033740B00BE3934 /* NexradMapKitBaseLayer.swift */; };
 		F00399C41DE9F7D6004508FE /* NexradLevel3WindBarbs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */; };
 		F011E61D1DB04E38006531FD /* CustomTabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F011E61C1DB04E38006531FD /* CustomTabBarVC.swift */; };
 		F0149B4E1E5BA72900418162 /* ObjectModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0149B4D1E5BA72900418162 /* ObjectModel.swift */; };
@@ -694,6 +695,7 @@
 		03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotter.swift; sourceTree = "<group>"; };
 		03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotterReport.swift; sourceTree = "<group>"; };
 		97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VcSettingsExperimental.swift; sourceTree = "<group>"; };
+		97943EC13033740B00BE3934 /* NexradMapKitBaseLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NexradMapKitBaseLayer.swift; sourceTree = "<group>"; };
 		F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NexradLevel3WindBarbs.swift; sourceTree = "<group>"; };
 		F011E61C1DB04E38006531FD /* CustomTabBarVC.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomTabBarVC.swift; sourceTree = "<group>"; };
 		F0149B4D1E5BA72900418162 /* ObjectModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectModel.swift; sourceTree = "<group>"; };
@@ -1282,6 +1284,7 @@
 				F0B335321DA3FD3B0035BD36 /* Warnings.swift */,
 				037162DD21C1013700B815BB /* Watch.swift */,
 				0354D3F723C1188C0024153D /* WpcFronts.swift */,
+				97943EC13033740B00BE3934 /* NexradMapKitBaseLayer.swift */,
 			);
 			path = radar;
 			sourceTree = "<group>";
@@ -1940,6 +1943,7 @@
 				03C0AF3A29239B2500E6BDCB /* SevenDayCollection.swift in Sources */,
 				F0B335DA1DA3FDA70035BD36 /* UtilityNexradColors.swift in Sources */,
 				F0B3353A1DA3FD3B0035BD36 /* Warnings.swift in Sources */,
+				97943EC23033740B00BE3934 /* NexradMapKitBaseLayer.swift in Sources */,
 				03BF51D52B44E73900164F31 /* VcWfoText.swift in Sources */,
 				F0FAD0471DCB4F860014752A /* UILabelInset.swift in Sources */,
 				F0DAD9361DA7018D00C2BD4B /* crctable.c in Sources */,

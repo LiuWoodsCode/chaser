@@ -7,6 +7,7 @@
 final class MetalRadarBuffers: MetalBuffers {
 
     var bgColor = 0
+    let useMapKitBaseLayer: Bool
     var fileName = "nids"
     var levelData = NexradLevelData()
     var fileStorage = FileStorage()
@@ -14,8 +15,9 @@ final class MetalRadarBuffers: MetalBuffers {
     var numberOfRangeBins = 0
     var binSize = 0.0
 
-    init(_ bgColor: Int) {
+    init(_ bgColor: Int, useMapKitBaseLayer: Bool = false) {
         self.bgColor = bgColor
+        self.useMapKitBaseLayer = useMapKitBaseLayer
     }
 
     var colorMap: ColorPalette { ColorPalette.colorMap[Int(levelData.productCode)]! }
@@ -40,6 +42,41 @@ final class MetalRadarBuffers: MetalBuffers {
         putColor(colorMap.redValues.get(Int(level)))
         putColor(colorMap.greenValues.get(Int(level)))
         putColor(colorMap.blueValues.get(Int(level)))
+    }
+
+    func shouldDrawLevel(_ level: UInt8) -> Bool {
+        !useMapKitBaseLayer || level != 0
+    }
+
+    func putRadialBin(
+        _ binStart: Double,
+        _ binEnd: Double,
+        _ angleVCos: Double,
+        _ angleVSin: Double,
+        _ angleCos: Double,
+        _ angleSin: Double,
+        _ level: UInt8
+    ) -> Bool {
+        guard shouldDrawLevel(level) else { return false }
+        putFloat(binStart * angleVCos)
+        putFloat(binStart * angleVSin)
+        putColorsByIndex(level)
+        putFloat(binEnd * angleVCos)
+        putFloat(binEnd * angleVSin)
+        putColorsByIndex(level)
+        putFloat(binEnd * angleCos)
+        putFloat(binEnd * angleSin)
+        putColorsByIndex(level)
+        putFloat(binStart * angleVCos)
+        putFloat(binStart * angleVSin)
+        putColorsByIndex(level)
+        putFloat(binEnd * angleCos)
+        putFloat(binEnd * angleSin)
+        putColorsByIndex(level)
+        putFloat(binStart * angleCos)
+        putFloat(binStart * angleSin)
+        putColorsByIndex(level)
+        return true
     }
 
     func generateRadials() -> Int {

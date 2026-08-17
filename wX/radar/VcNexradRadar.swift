@@ -50,7 +50,8 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
                                    #selector(animateClicked))
         nexradState.setupMetalLayer()
         nexradState.setPaneSize(UtilityUI.getScreenBoundsCGSize())
-        nexradState.setupRenders(view, radarSiteOverride, nexradSubmenu)
+        nexradState.setupRenders(view, radarSiteOverride, nexradSubmenu, useMapKitBaseLayer: RadarPreferences.useMapKitBaseLayer)
+        nexradUI.setupMapKitBaseLayer(self, nexradState)
         nexradAnimation = NexradAnimation(nexradUI, nexradState.wxMetalRenders, nexradSubmenu, nexradLayerDownload)
         nexradLongPress = NexradLongPressMenu(self, nexradState, nexradSubmenu, showTiltMenu, radarSiteChanged)
         nexradUI.setupMetal(self, nexradState, render, #selector(newFrame(displayLink:)))
@@ -75,6 +76,7 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
         }
         coordinator.animate(alongsideTransition: nil) { _ in
             self.nexradUI.map.setupLocations(RadarSites.nexradRadars() + RadarSites.tdwrRadars())
+            self.nexradUI.updateMapKitBaseLayer(self, self.nexradState)
             self.nexradState.resetTextObject(self)
         }
     }
@@ -117,6 +119,10 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
          }
      }
 
+    private func updateMapKitBaseLayer() {
+        nexradUI.updateMapKitBaseLayer(self, nexradState)
+    }
+
     func setupGestures() {
         let gestureRecognizerSingleTap = GestureData(self, #selector(tapGesture))
         gestureRecognizerSingleTap.numberOfTapsRequired = 1
@@ -141,19 +147,23 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
     @objc func tapGesture(_ gestureRecognizer: GestureData) {
         if !nexradUI.map.isShown {
             NexradRenderSurfaceView.singleTap(self, nexradState.wxMetalRenders, nexradState.wxMetalTextObject, gestureRecognizer)
+            updateMapKitBaseLayer()
         }
     }
 
     @objc func tapGestureDouble(_ gestureRecognizer: GestureData) {
         NexradRenderSurfaceView.doubleTap(self, nexradState.wxMetalRenders, nexradState.wxMetalTextObject, nexradState.numberOfPanes, gestureRecognizer)
+        updateMapKitBaseLayer()
     }
 
     @objc func gestureZoom(_ gestureRecognizer: UIPinchGestureRecognizer) {
         NexradRenderSurfaceView.gestureZoom(self, nexradState.wxMetalRenders, nexradState.wxMetalTextObject, gestureRecognizer)
+        updateMapKitBaseLayer()
     }
 
     @objc func gesturePan(_ gestureRecognizer: UIPanGestureRecognizer) {
         NexradRenderSurfaceView.gesturePan(self, nexradState.wxMetalRenders, nexradState.wxMetalTextObject, gestureRecognizer)
+        updateMapKitBaseLayer()
     }
 
     @objc func gestureLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
@@ -184,6 +194,7 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
                 }
                 nexradUI.stopGps()
                 nexradAnimation.stop()
+                nexradUI.removeMapKitBaseLayer()
                 if savePreferences {
                     nexradState.wxMetalRenders.forEach {
                         $0!.state.writePreferences()
@@ -198,7 +209,9 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
                     nexradState.metalLayer[$0] = nil
                 }
                 nexradState.wxMetalRenders.indices.forEach {
-                    nexradState.wxMetalRenders[$0]?.data = NexradRenderData()
+                    if let wxMetalRender = nexradState.wxMetalRenders[$0] {
+                        wxMetalRender.data = NexradRenderData(useMapKitBaseLayer: wxMetalRender.data.useMapKitBaseLayer)
+                    }
                     nexradState.wxMetalRenders[$0] = nil
                 }
                 nexradState.commandQueue = nil
@@ -298,6 +311,7 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
         } else {
             nexradState.wxMetalRenders[index]!.resetRadarSiteAndGetData(radarSite)
         }
+        updateMapKitBaseLayer()
         nexradState.resetTextObject(self)
     }
 
@@ -325,6 +339,7 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
                     $0!.state.gpsLocation = LatLon(Double(locValue.latitude), Double(locValue.longitude)).reverse()
                     $0!.construct.locationDot($0!.data.locdotBuffers, $0!.data.locCircleBuffers, $0!.setZoom)
                 }
+                updateMapKitBaseLayer()
             }
         }
     }
@@ -384,42 +399,49 @@ final class VcNexradRadar: UIViewController, MKMapViewDelegate, CLLocationManage
     }
 
     @objc func keyRightArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .right)
+        moveByKey(.right)
     }
 
     @objc func keyLeftArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .left)
+        moveByKey(.left)
     }
 
     @objc func keyUpArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .up)
+        moveByKey(.up)
     }
 
     @objc func keyDownArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .down)
+        moveByKey(.down)
     }
 
     @objc func keyRightUpArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .rightUp)
+        moveByKey(.rightUp)
     }
 
     @objc func keyRightDownArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .rightDown)
+        moveByKey(.rightDown)
     }
 
     @objc func keyLeftUpArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .leftUp)
+        moveByKey(.leftUp)
     }
 
     @objc func keyLeftDownArrow() {
-        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, .leftDown)
+        moveByKey(.leftDown)
     }
 
     @objc func keyZoomIn() {
         NexradRenderUI.zoomInByKey(nexradState.wxMetalRenders)
+        updateMapKitBaseLayer()
     }
 
     @objc func keyZoomOut() {
         NexradRenderUI.zoomOutByKey(nexradState.wxMetalRenders)
+        updateMapKitBaseLayer()
+    }
+
+    private func moveByKey(_ direction: KeyDirections) {
+        NexradRenderUI.moveByKey(nexradState.wxMetalRenders, direction)
+        updateMapKitBaseLayer()
     }
 }

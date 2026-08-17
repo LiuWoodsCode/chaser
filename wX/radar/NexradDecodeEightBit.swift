@@ -55,32 +55,17 @@ final class NexradDecodeEightBit {
                 if curLevel == level {
                     levelCount += 1
                 } else {
-                    // 1
-                    radarBuffers.putFloat(binStart * angleVCos)
-                    radarBuffers.putFloat(binStart * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 2
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleVCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 3
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 1
-                    radarBuffers.putFloat(binStart * angleVCos)
-                    radarBuffers.putFloat(binStart * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 3
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.binSize * Double(levelCount)) * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 4
-                    radarBuffers.putFloat(binStart * angleCos)
-                    radarBuffers.putFloat(binStart * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-
-                    totalBins += 1
+                    if radarBuffers.putRadialBin(
+                        binStart,
+                        binStart + radarBuffers.binSize * Double(levelCount),
+                        angleVCos,
+                        angleVSin,
+                        angleCos,
+                        angleSin,
+                        level
+                    ) {
+                        totalBins += 1
+                    }
                     level = curLevel
                     binStart = Double(bin) * radarBuffers.binSize
                     levelCount = 1
@@ -127,32 +112,17 @@ final class NexradDecodeEightBit {
                 if curLevel == level {
                     levelCount += 1
                 } else {
-                    // 1
-                    radarBuffers.putFloat(binStart * angleVCos)
-                    radarBuffers.putFloat(binStart * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 2
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleVCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 3
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 1
-                    radarBuffers.putFloat(binStart * angleVCos)
-                    radarBuffers.putFloat(binStart * angleVSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 3
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleCos)
-                    radarBuffers.putFloat((binStart + radarBuffers.levelData.binSize * Double(levelCount)) * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-                    // 4
-                    radarBuffers.putFloat(binStart * angleCos)
-                    radarBuffers.putFloat(binStart * angleSin)
-                    radarBuffers.putColorsByIndex(level)
-
-                    totalBins += 1
+                    if radarBuffers.putRadialBin(
+                        binStart,
+                        binStart + radarBuffers.levelData.binSize * Double(levelCount),
+                        angleVCos,
+                        angleVSin,
+                        angleCos,
+                        angleSin,
+                        level
+                    ) {
+                        totalBins += 1
+                    }
                     level = curLevel
                     binStart = Double(bin) * radarBuffers.levelData.binSize + radarBlackHoleAdd
                     levelCount = 1

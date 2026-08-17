@@ -30,6 +30,8 @@ final class NexradState {
             metalLayer[index]!.device = device
             metalLayer[index]!.pixelFormat = .bgra8Unorm
             metalLayer[index]!.framebufferOnly = true
+            metalLayer[index]!.isOpaque = !RadarPreferences.useMapKitBaseLayer
+            metalLayer[index]!.backgroundColor = RadarPreferences.useMapKitBaseLayer ? UIColor.clear.cgColor : UIColor.black.cgColor
         }
         let defaultLibrary = device.makeDefaultLibrary()!
         let fragmentProgram = defaultLibrary.makeFunction(name: "basic_fragment")
@@ -46,7 +48,7 @@ final class NexradState {
         commandQueue = device.makeCommandQueue()
     }
 
-    func setupRenders(_ view: UIView, _ radarSiteOverride: String, _ nexradSubmenu: NexradSubmenu) {
+    func setupRenders(_ view: UIView, _ radarSiteOverride: String, _ nexradSubmenu: NexradSubmenu, useMapKitBaseLayer: Bool = false) {
         metalLayer.forEach { mlayer in
             view.layer.addSublayer(mlayer!)
         }
@@ -58,7 +60,8 @@ final class NexradState {
                     nexradSubmenu.timeButton,
                     nexradSubmenu.productButton[index],
                     paneNumber: index,
-                    numberOfPanes))
+                    numberOfPanes,
+                    useMapKitBaseLayer: useMapKitBaseLayer))
         }
         nexradSubmenu.productButton.enumerated().forEach {
             $1.title = wxMetalRenders[$0]!.state.product

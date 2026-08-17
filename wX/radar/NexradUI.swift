@@ -17,6 +17,7 @@ final class NexradUI {
 
     var inOglAnim = false
     let map = Map(.radar)
+    private let mapKitBaseLayer = NexradMapKitBaseLayer()
     var locationManager = CLLocationManager()
     var oneMinRadarFetch = Timer()
     var mapIndex = 0
@@ -44,6 +45,19 @@ final class NexradUI {
 
     func hideMap(_ uiv: UIViewController) {
         map.toggle(uiv)
+    }
+
+    func setupMapKitBaseLayer(_ uiv: UIViewController, _ nexradState: NexradState) {
+        mapKitBaseLayer.setup(uiv.view, nexradState.numberOfPanes)
+        updateMapKitBaseLayer(uiv, nexradState)
+    }
+
+    func updateMapKitBaseLayer(_ uiv: UIViewController, _ nexradState: NexradState) {
+        mapKitBaseLayer.update(uiv, nexradState)
+    }
+
+    func removeMapKitBaseLayer() {
+        mapKitBaseLayer.remove()
     }
 
     func setupGps(_ uiv: VcNexradRadar) {

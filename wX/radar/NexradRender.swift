@@ -29,7 +29,7 @@ final class NexradRender {
     var renderFn: ((Int) -> Void)?
     let fileStorage = FileStorage()
     let state = NexradRenderState()
-    var data = NexradRenderData()
+    var data: NexradRenderData
     let construct: NexradRenderConstruct!
 
     init(_ device: MTLDevice,
@@ -37,8 +37,10 @@ final class NexradRender {
          _ timeButton: ToolbarIcon,
          _ productButton: ToolbarIcon,
          paneNumber: Int,
-         _ numberOfPanes: Int
+         _ numberOfPanes: Int,
+         useMapKitBaseLayer: Bool = false
     ) {
+        data = NexradRenderData(useMapKitBaseLayer: useMapKitBaseLayer)
         self.wxMetalTextObject = wxMetalTextObject
         self.device = device
         self.timeButton = timeButton
@@ -68,11 +70,12 @@ final class NexradRender {
         let renderPassDescriptor = MTLRenderPassDescriptor()
         renderPassDescriptor.colorAttachments[0].texture = drawable.texture
         renderPassDescriptor.colorAttachments[0].loadAction = .clear
+        let clearAlpha = data.useMapKitBaseLayer ? 0.0 : 1.0
         renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(
             red: Double(Color.red(data.radarBuffers.bgColor)) / 255.0,
             green: Double(Color.green(data.radarBuffers.bgColor)) / 255.0,
             blue: Double(Color.blue(data.radarBuffers.bgColor)) / 255.0,
-            alpha: 1.0
+            alpha: clearAlpha
         )
         renderPassDescriptor.colorAttachments[0].storeAction = .store
         let commandBuffer = commandQueue.makeCommandBuffer()

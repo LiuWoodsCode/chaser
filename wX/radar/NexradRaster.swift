@@ -34,31 +34,33 @@ final class NexradRaster {
         (0..<numberOfRows).forEach { g in
             (0..<binsPerRow).forEach { bin in
                 curLevel = radarBuffers.levelData.binWord.get(g * binsPerRow + bin)
-                // 1
-                radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                // 2
-                radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                // 3
-                radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                // 1
-                radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                // 3
-                radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                // 4
-                radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
-                radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
-                radarBuffers.putColorsByIndex(curLevel)
-                totalBins += 1
+                if radarBuffers.shouldDrawLevel(curLevel) {
+                    // 1
+                    radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    // 2
+                    radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    // 3
+                    radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    // 1
+                    radarBuffers.putFloat(Float(bin - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    // 3
+                    radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g + 1 - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    // 4
+                    radarBuffers.putFloat(Float(bin + 1 - halfPoint) * scaleFactor)
+                    radarBuffers.putFloat(Float(g - halfPoint) * scaleFactor * yShift)
+                    radarBuffers.putColorsByIndex(curLevel)
+                    totalBins += 1
+                }
             }
         }
         return totalBins

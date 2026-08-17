@@ -43,6 +43,7 @@ final class RadarPreferences {
     static var wxoglCenterOnLocation = false
     static var wpcFronts = false
     static var showRadarWhenPan = true
+    static var useMapKitBaseLayer = false
     static let nexradContinuousMode = true
 
     static var colorHw = 0
@@ -121,6 +122,7 @@ final class RadarPreferences {
         wxoglCenterOnLocation = Utility.readPref("RADAR_CENTER_ON_LOCATION", "false").hasPrefix("t")
         wpcFronts = Utility.readPref("RADAR_SHOW_WPC_FRONTS", "false").hasPrefix("t")
         showRadarWhenPan = Utility.readPref("SHOW_RADAR_WHEN_PAN", "true").hasPrefix("t")
+        useMapKitBaseLayer = Utility.readPref("NEXRAD_USE_MAPKIT_BASE_LAYER", "false").hasPrefix("t")
     }
 
     private static func radarGeometrySetColors() {
