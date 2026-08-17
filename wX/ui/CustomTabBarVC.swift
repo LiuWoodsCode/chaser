@@ -96,7 +96,7 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
     }
 
     func install(in titlebar: UITitlebar) {
-        titlebar.toolbarStyle = .unifiedCompact
+        titlebar.toolbarStyle = .unified
         titlebar.toolbar = toolbar
         titlebar.autoHidesToolbarInFullScreen = true
         setSelectedTab(tabBarController?.selectedIndex ?? 0)
