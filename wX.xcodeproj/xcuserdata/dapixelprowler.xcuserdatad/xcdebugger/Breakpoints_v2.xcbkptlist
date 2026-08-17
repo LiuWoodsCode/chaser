@@ -16,7 +16,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "34"
             endingLineNumber = "34"
-            landmarkName = "iconToString"
+            landmarkName = "iconToAccessibilityLabel"
             landmarkType = "24">
          </BreakpointContent>
       </BreakpointProxy>
