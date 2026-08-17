@@ -11,22 +11,38 @@ import SafariServices
 
 final class Route {
 
-    static func subMenuClicked(_ uiv: UIViewController, _ button: ToolbarIcon) {
-        // items in the list below need to match items in subMenuItemClicked's switch
-        let menuList = [
-            "Hourly Forecast",
-            "Radar Mosaic",
-            "US Alerts",
-            "Observations",
-            "Soundings",
-            "PlayList",
-            "Settings"
-        ]
-        let popUp = PopUp(uiv, button, "Select from:")
-        menuList.forEach { item in
-            popUp.add(Action(item) { subMenuItemClicked(uiv, item) })
+    private struct SubMenuItem {
+        let title: String
+        let systemImageName: String
+    }
+
+    // Items in this list need to match subMenuItemClicked's switch.
+    private static let subMenuItems = [
+        SubMenuItem(title: "Hourly Forecast", systemImageName: "clock"),
+        SubMenuItem(title: "Radar Mosaic", systemImageName: "map"),
+        SubMenuItem(title: "US Alerts", systemImageName: "exclamationmark.triangle"),
+        SubMenuItem(title: "Observations", systemImageName: "list.bullet.rectangle"),
+        SubMenuItem(title: "Soundings", systemImageName: "chart.xyaxis.line"),
+        SubMenuItem(title: "PlayList", systemImageName: "play.rectangle"),
+        SubMenuItem(title: "Settings", systemImageName: "gearshape")
+    ]
+
+    static func subMenu(_ uiv: UIViewController) -> UIMenu {
+        subMenu { [weak uiv] in uiv }
+    }
+
+    static func subMenu(_ controllerProvider: @escaping () -> UIViewController?) -> UIMenu {
+        let actions = subMenuItems.map { item in
+            UIAction(title: item.title, image: UIImage(systemName: item.systemImageName)) { _ in
+                guard let uiv = controllerProvider() else { return }
+                subMenuItemClicked(uiv, item.title)
+            }
         }
-        popUp.finish()
+        return UIMenu(title: "", children: actions)
+    }
+
+    static func subMenuClicked(_ uiv: UIViewController, _ button: ToolbarIcon) {
+        button.setMenu(subMenu(uiv))
     }
 
     static func subMenuItemClicked(_ uiv: UIViewController, _ menuItem: String) {

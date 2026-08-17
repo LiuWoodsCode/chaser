@@ -19,11 +19,14 @@ final class TileMatrix {
         self.init()
         self.uiv = uiv
         self.tabType = tabType
+        #if targetEnvironment(macCatalyst)
+        #else
         toolbar = Toolbar()
         let radarButton = ToolbarIcon(uiv, .radar, #selector(radarClicked))
         let cloudButton = ToolbarIcon(uiv, .cloud, #selector(cloudClicked))
         let wfoTextButton = ToolbarIcon(uiv, .wfo, #selector(wfotextClicked))
         menuButton = ToolbarIcon(uiv, .submenu, #selector(menuClicked))
+        menuButton.setMenu(Route.subMenu(uiv))
         let dashButton = ToolbarIcon(uiv, .severeDashboard, #selector(dashClicked))
         if UIPreferences.mainScreenRadarFab {
             toolbar.items = ToolbarItems(
@@ -43,6 +46,7 @@ final class TileMatrix {
         }
         uiv.view.addSubview(toolbar)
         toolbar.setConfigWithUiv(uiv, toolbarType: .top)
+        #endif
         let rowCount = UIPreferences.tilesPerRow
         let iconsPerRow = CGFloat(rowCount)
         switch tabType {

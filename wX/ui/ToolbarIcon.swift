@@ -8,54 +8,34 @@ import UIKit
 
 final class ToolbarIcon: UIBarButtonItem, Widget {
 
-    static let oldIconToNew = [
-        "ic_arrow_back_white_24dp": "chevron.left",
-        "ic_play_arrow_24dp": "play.fill",
-        "ic_share_24dp": "square.and.arrow.up",
-        "ic_queue_24dp": "folder.badge.plus",
-        "ic_gps_fixed_white_24dp": "location.fill",
-        "ic_delete_24dp": "trash.fill",
-        "ic_search_24dp": "magnifyingglass",
-        "ic_done_24dp": "checkmark",
-        "ic_report_24dp": "exclamationmark.shield.fill",
-        "ic_cloud_24dp": "smoke.fill",
-        "ic_info_outline_24dp": "doc.circle.fill",
-        "ic_more_vert_white_24dp": "ellipsis",
-        "ic_add_box_24dp": "plus.app.fill",
-        "ic_flash_on_24dp": "bolt.fill",
-        "ic_keyboard_arrow_left_24dp": "chevron.left",
-        "ic_keyboard_arrow_right_24dp": "chevron.right",
-        "ic_get_app_24dp": "arrow.2.circlepath.circle.fill",
-        "ic_stop_24dp": "stop.fill",
-        "ic_pause_24dp": "pause.fill"
-    ]
-
-    static let iconToString: [IconType: String] = [
-        .share: "ic_share_24dp",
-        .pause: "ic_pause_24dp",
-        .play: "ic_play_arrow_24dp",
-        .playList: "ic_queue_24dp",
-        .stop: "ic_stop_24dp",
-        .done: "ic_arrow_back_white_24dp",
-        .radar: "ic_flash_on_24dp",
-        .plus: "ic_add_box_24dp",
-        .cloud: "ic_cloud_24dp",
-        .save: "ic_done_24dp",
-        .search: "ic_search_24dp",
-        .delete: "ic_delete_24dp",
-        .gps: "ic_gps_fixed_white_24dp",
-        .submenu: "ic_more_vert_white_24dp",
-        .wfo: "ic_info_outline_24dp",
-        .severeDashboard: "ic_report_24dp",
-        .leftArrow: "ic_keyboard_arrow_left_24dp",
-        .rightArrow: "ic_keyboard_arrow_right_24dp",
-        .download: "ic_get_app_24dp"
+    static let iconToSymbolName: [IconType: String] = [
+        .share: "square.and.arrow.up",
+        .pause: "pause.fill",
+        .play: "play.fill",
+        .playList: "folder.badge.plus",
+        .stop: "stop.fill",
+        .done: "chevron.left",
+        .radar: "bolt.fill",
+        .plus: "plus.app.fill",
+        .cloud: "cloud.fill",
+        .save: "checkmark",
+        .search: "magnifyingglass",
+        .delete: "trash.fill",
+        .gps: "location.fill",
+        .submenu: "ellipsis",
+        .wfo: "doc.circle.fill",
+        .severeDashboard: "exclamationmark.shield.fill",
+        .leftArrow: "chevron.left",
+        .rightArrow: "chevron.right",
+        .download: "arrow.2.circlepath.circle.fill"
     ]
 
     static let iconToAccessibilityLabel: [IconType: String] = [
         .share: "share content",
+        .pause: "pause",
         .play: "play",
         .playList: "play list",
+        .stop: "stop",
         .done: "go back",
         .radar: "radar",
         .plus: "add",
@@ -64,14 +44,14 @@ final class ToolbarIcon: UIBarButtonItem, Widget {
         .search: "search",
         .delete: "delete",
         .gps: "GPS",
-        .submenu: "submenu",
+        .submenu: "More",
         .wfo: "wfo",
         .severeDashboard: "severe dashboard",
         .leftArrow: "go left",
-        .rightArrow: "go right"
+        .rightArrow: "go right",
+        .download: "download"
     ]
 
-    private let toolbarIconPadding: CGFloat = 11.0
     private var button = UIButton()
     private var forceLight = false
 
@@ -79,93 +59,34 @@ final class ToolbarIcon: UIBarButtonItem, Widget {
         super.init()
     }
 
-    convenience init(_ uiv: UIViewController, _ iconStr: String, _ action: Selector, isLabel: Bool = false, forceLight: Bool = false) {
+    convenience init(_ uiv: UIViewController, _ symbolName: String, _ action: Selector, isLabel: Bool = false, forceLight: Bool = false) {
         self.init()
         self.forceLight = forceLight
         if #available(iOS 26, *) {
             hidesSharedBackground = isLabel
         }
-        button = UIButton(frame: CGRect(x: 0, y: 0, width: UIPreferences.toolbarHeight, height: UIPreferences.toolbarHeight))
-        button.imageEdgeInsets = UIEdgeInsets(
-            top: toolbarIconPadding,
-            left: toolbarIconPadding,
-            bottom: toolbarIconPadding,
-            right: toolbarIconPadding
-        )
-        button.setImage(UIImage(named: iconStr), for: .normal)
-
-        let configuration = UIImage.SymbolConfiguration(weight: .medium)
-        var color = UIColor.white
-        if #available(iOS 26, *) {
-            if UITraitCollection.current.userInterfaceStyle == .dark {
-                color = UIColor.white
-            } else {
-                color = UIColor.black
-            }
-            if forceLight {
-                color = UIColor.white
-            }
-        }
-        let newIconValue = ToolbarIcon.oldIconToNew[iconStr]
-        if newIconValue != nil {
-            let image = UIImage(
-                systemName: newIconValue!,
-                withConfiguration: configuration
-                )?.withTintColor(color, renderingMode: .alwaysOriginal)
-            button.setImage(image, for: .normal)
-        }
-        if #available(iOS 26, *) {
-//            style = .prominent
-//            let c = AppColors.primaryColorFab
-//            c.withAlphaComponent(0.1)
-//            tintColor = c
-        }
-
+        button = makeButton(symbolName: symbolName, color: symbolColor(forceLight: forceLight))
         customView = button
         button.addTarget(uiv, action: action, for: .touchUpInside)
-        let widthConstraint = button.widthAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
-        let heightConstraint = button.heightAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
-        heightConstraint.isActive = true
-        widthConstraint.isActive = true
+        constrainButton()
     }
 
     // severe dashboard and us alerts
     convenience init(_ iconType: IconType, _ gesture: GestureData) {
         self.init()
-        let iconStr = ToolbarIcon.iconToString[iconType] ?? ""
-        button = UIButton(frame: CGRect(x: 0, y: 0, width: UIPreferences.toolbarHeight, height: UIPreferences.toolbarHeight))
-        button.imageEdgeInsets = UIEdgeInsets(
-            top: toolbarIconPadding,
-            left: toolbarIconPadding,
-            bottom: toolbarIconPadding,
-            right: toolbarIconPadding
-        )
-        button.setImage(UIImage(named: iconStr), for: .normal)
-
-        let configuration = UIImage.SymbolConfiguration(weight: .medium)
+        let symbolName = ToolbarIcon.iconToSymbolName[iconType] ?? ""
         var color = UIColor.black
         if UITraitCollection.current.userInterfaceStyle == .dark {
             color = UIColor.white
         }
-        let newIconValue = ToolbarIcon.oldIconToNew[iconStr]
-        if newIconValue != nil {
-            let image = UIImage(
-                systemName: newIconValue!,
-                withConfiguration: configuration
-                )?.withTintColor(color, renderingMode: .alwaysOriginal)
-            button.setImage(image, for: .normal)
-        }
-
+        button = makeButton(symbolName: symbolName, color: color)
         customView = button
         button.addGestureRecognizer(gesture)
-        let widthConstraint = button.widthAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
-        let heightConstraint = button.heightAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
-        heightConstraint.isActive = true
-        widthConstraint.isActive = true
+        constrainButton()
     }
 
     convenience init(_ uiv: UIViewController, _ iconType: IconType, _ action: Selector, isLabel: Bool = false, forceLight: Bool = false) {
-        self.init(uiv, ToolbarIcon.iconToString[iconType] ?? "", action, isLabel: isLabel, forceLight: forceLight)
+        self.init(uiv, ToolbarIcon.iconToSymbolName[iconType] ?? "", action, isLabel: isLabel, forceLight: forceLight)
         button.isAccessibilityElement = true
         button.accessibilityLabel = ToolbarIcon.iconToAccessibilityLabel[iconType] ?? "No label"
     }
@@ -194,28 +115,18 @@ final class ToolbarIcon: UIBarButtonItem, Widget {
     required init?(coder aDecoder: NSCoder) { fatalError("init(coder:) has not been implemented") }
 
     func set(_ iconType: IconType) {
-        let fileName = ToolbarIcon.iconToString[iconType] ?? ""
-        button.setImage(UIImage(named: fileName), for: .normal)
-        let configuration = UIImage.SymbolConfiguration(weight: .medium)
-        var color = UIColor.white
-        if #available(iOS 26, *) {
-            if UITraitCollection.current.userInterfaceStyle == .dark {
-                color = UIColor.white
-            } else {
-                color = UIColor.black
-            }
-            if forceLight {
-                color = UIColor.white
-            }
-        }
-        let newIconValue = ToolbarIcon.oldIconToNew[fileName]
-        if newIconValue != nil {
-            let image = UIImage(
-                systemName: newIconValue!,
-                withConfiguration: configuration
-                )?.withTintColor(color, renderingMode: .alwaysOriginal)
-            button.setImage(image, for: .normal)
-        }
+        button.setImage(Self.symbolImage(iconType, color: symbolColor(forceLight: forceLight)), for: .normal)
+    }
+
+    static func symbolImage(_ iconType: IconType, color: UIColor) -> UIImage? {
+        let symbolName = iconToSymbolName[iconType] ?? ""
+        return symbolImage(named: symbolName, color: color)
+    }
+
+    static func symbolImage(named symbolName: String, color: UIColor) -> UIImage? {
+        let configuration = UIImage.SymbolConfiguration(pointSize: 20.0, weight: .medium)
+        return UIImage(systemName: symbolName, withConfiguration: configuration)?
+            .withTintColor(color, renderingMode: .alwaysOriginal)
     }
 
     func setColor(_ uicolor: UIColor) {
@@ -246,7 +157,48 @@ final class ToolbarIcon: UIBarButtonItem, Widget {
         }
     }
 
+    func setMenu(_ menu: UIMenu) {
+        self.menu = menu
+        primaryAction = nil
+        target = nil
+        action = nil
+        button.removeTarget(nil, action: nil, for: .allEvents)
+        button.menu = menu
+        button.showsMenuAsPrimaryAction = true
+        button.accessibilityLabel = "More"
+    }
+
     func getView() -> UIView {
         button
+    }
+
+    private func makeButton(symbolName: String, color: UIColor) -> UIButton {
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: UIPreferences.toolbarHeight, height: UIPreferences.toolbarHeight))
+        button.setImage(Self.symbolImage(named: symbolName, color: color), for: .normal)
+        button.tintColor = color
+        button.imageView?.contentMode = .scaleAspectFit
+        return button
+    }
+
+    private func constrainButton() {
+        let widthConstraint = button.widthAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
+        let heightConstraint = button.heightAnchor.constraint(equalToConstant: UIPreferences.toolbarHeight)
+        heightConstraint.isActive = true
+        widthConstraint.isActive = true
+    }
+
+    private func symbolColor(forceLight: Bool) -> UIColor {
+        var color = UIColor.white
+        if #available(iOS 26, *) {
+            if UITraitCollection.current.userInterfaceStyle == .dark {
+                color = UIColor.white
+            } else {
+                color = UIColor.black
+            }
+            if forceLight {
+                color = UIColor.white
+            }
+        }
+        return color
     }
 }

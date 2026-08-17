@@ -50,14 +50,17 @@ final class VcTabLocation: VcTabParent {
 //        scrollView.backgroundColor = ColorCompatibility.systemGray5
         scrollView.backgroundColor = AppColors.primaryBackgroundBlueUIColor
         boxMain.getView().backgroundColor = ColorCompatibility.systemGray5
+        #if targetEnvironment(macCatalyst)
+        #else
         toolbar.resize(uiv: self)
+        #endif
         fab?.resize()
-        var topSpace: CGFloat
-        if #available(iOS 26, *) {
-            topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
-        } else {
-            topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
-        }
+        let topSpace: CGFloat
+        #if targetEnvironment(macCatalyst)
+        topSpace = UtilityUI.getTopPadding()
+        #else
+        topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
+        #endif
         if objScrollStackView != nil && objScrollStackView!.fragmentHeightAnchor1 != nil {
             view.removeConstraints([
                 objScrollStackView!.fragmentHeightAnchor1!,
@@ -67,12 +70,16 @@ final class VcTabLocation: VcTabParent {
             ])
         }
         if objScrollStackView != nil {
-            var bottomSpace: CGFloat
+            let bottomSpace: CGFloat
+            #if targetEnvironment(macCatalyst)
+            bottomSpace = 0.0
+            #else
             if #available(iOS 26, *) {
                 bottomSpace = 0.0 // -1.0 * UtilityUI.getBottomPadding()
             } else {
                 bottomSpace = -1.0 * (UIPreferences.tabBarHeight + UtilityUI.getBottomPadding())
             }
+            #endif
             objScrollStackView!.fragmentHeightAnchor1 = scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: bottomSpace)
             objScrollStackView!.fragmentHeightAnchor2 = scrollView.topAnchor.constraint(equalTo: view.topAnchor, constant: topSpace)
             objScrollStackView!.fragmentWidthAnchor1 = scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor)
@@ -111,12 +118,15 @@ final class VcTabLocation: VcTabParent {
     }
 
     func setupToolbar() {
-//        setupMenu()
+        #if targetEnvironment(macCatalyst)
+        return
+        #else
         toolbar = Toolbar()
         let radarButton = ToolbarIcon(self, .radar, #selector(radarClicked))
         let cloudButton = ToolbarIcon(self, .cloud, #selector(cloudClicked))
         let wfoTextButton = ToolbarIcon(self, .wfo, #selector(wfotextClicked))
         menuButton = ToolbarIcon(self, .submenu, #selector(menuClicked))
+        menuButton.setMenu(Route.subMenu(self))
         let dashButton = ToolbarIcon(self, .severeDashboard, #selector(dashClicked))
         if UIPreferences.mainScreenRadarFab {
             toolbar.items = ToolbarItems(
@@ -136,6 +146,7 @@ final class VcTabLocation: VcTabParent {
         }
         view.addSubview(toolbar)
         toolbar.setConfigWithUiv(self, toolbarType: .top)
+        #endif
     }
 
     @objc func getContentSuper() {
@@ -390,7 +401,10 @@ final class VcTabLocation: VcTabParent {
     }
 
     override func updateColors() {
+        #if targetEnvironment(macCatalyst)
+        #else
         toolbar.setColorToTheme()
+        #endif
         locationLabel.color = ColorCompatibility.highlightText
         view.backgroundColor = AppColors.primaryBackgroundBlueUIColor
         setTabBarColor()

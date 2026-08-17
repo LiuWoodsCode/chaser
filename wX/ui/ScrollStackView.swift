@@ -49,18 +49,26 @@ final class ScrollStackView {
         scrollView.backgroundColor = AppColors.primaryBackgroundBlueUIColor
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         uiv.view.addSubview(scrollView)
-        var topSpace: CGFloat
+        let topSpace: CGFloat
+        #if targetEnvironment(macCatalyst)
+        topSpace = UtilityUI.getTopPadding()
+        #else
         if #available(iOS 26, *) {
             topSpace = UtilityUI.getTopPadding()
         } else {
             topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
         }
-        var bottomSpace: CGFloat
+        #endif
+        let bottomSpace: CGFloat
+        #if targetEnvironment(macCatalyst)
+        bottomSpace = 0.0
+        #else
         if #available(iOS 26, *) {
             bottomSpace = 0.0 // -1.0 * UtilityUI.getBottomPadding()
         } else {
             bottomSpace = -1.0 * (UIPreferences.tabBarHeight + UtilityUI.getBottomPadding())
         }
+        #endif
         fragmentHeightAnchor1 = scrollView.bottomAnchor.constraint(equalTo: uiv.view.bottomAnchor, constant: bottomSpace)
         fragmentHeightAnchor2 = scrollView.topAnchor.constraint(equalTo: uiv.view.topAnchor, constant: topSpace)
         fragmentWidthAnchor1 = scrollView.leadingAnchor.constraint(equalTo: uiv.view.leadingAnchor)

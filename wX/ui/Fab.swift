@@ -24,17 +24,8 @@ final class Fab: Widget {
         #if targetEnvironment(macCatalyst)
 
         #else
-        let imageString = ToolbarIcon.iconToString[iconType] ?? ""
-        floaty.buttonImage = UtilityImg.resizeImage(UIImage(named: imageString)!, 0.50)
-        let configuration = UIImage.SymbolConfiguration(weight: .medium)
-        let color = UIColor.white
-        let newIconValue = ToolbarIcon.oldIconToNew[imageString]
-        if newIconValue != nil {
-            let image = UIImage(
-                systemName: newIconValue!,
-                withConfiguration: configuration
-                )?.withTintColor(color, renderingMode: .alwaysOriginal)
-            floaty.buttonImage = UtilityImg.resizeImage(image!, 1.00)
+        if let image = ToolbarIcon.symbolImage(iconType, color: UIColor.white) {
+            floaty.buttonImage = UtilityImg.resizeImage(image, 1.00)
         }
         #endif
     }

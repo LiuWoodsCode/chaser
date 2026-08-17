@@ -61,7 +61,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         builder.remove(menu: .services)
         builder.remove(menu: .format)
         builder.remove(menu: .edit)
-        builder.remove(menu: .toolbar)
         builder.remove(menu: .file)
         /*let refreshCommand = UIKeyCommand(input: "R", modifierFlags: [.command], action: #selector(nil))
         refreshCommand.title = "Reload data"

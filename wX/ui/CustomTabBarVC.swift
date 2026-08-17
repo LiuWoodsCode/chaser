@@ -7,7 +7,15 @@
 import Foundation
 import UIKit
 
-final class CustomTabBarVC: UITabBarController {
+#if targetEnvironment(macCatalyst)
+import AppKit
+#endif
+
+final class CustomTabBarVC: UITabBarController, UITabBarControllerDelegate {
+
+    #if targetEnvironment(macCatalyst)
+    private var macToolbarController: MacToolbarController?
+    #endif
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -17,6 +25,10 @@ final class CustomTabBarVC: UITabBarController {
                 if let image = $0.image { $0.image = image.withRenderingMode(.alwaysOriginal) }
             }
         }
+        #if targetEnvironment(macCatalyst)
+        delegate = self
+        tabBar.isHidden = true
+        #endif
         // To remove dependancy on storyboard uncomment the following and 3 lines in AppDelegate.application
         // In Deployment Info change Main Interface from Main to ""
         /*
@@ -30,4 +42,198 @@ final class CustomTabBarVC: UITabBarController {
         viewControllers = tabBarList
          */
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        #if targetEnvironment(macCatalyst)
+        installMacToolbar()
+        #endif
+    }
+
+    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+        #if targetEnvironment(macCatalyst)
+        macToolbarController?.setSelectedTab(selectedIndex)
+        #endif
+    }
+
+    #if targetEnvironment(macCatalyst)
+    private func installMacToolbar() {
+        guard let titlebar = view.window?.windowScene?.titlebar else { return }
+        if macToolbarController == nil {
+            macToolbarController = MacToolbarController(tabBarController: self)
+        }
+        macToolbarController?.install(in: titlebar)
+    }
+    #endif
 }
+
+#if targetEnvironment(macCatalyst)
+private final class MacToolbarController: NSObject, NSToolbarDelegate {
+
+    private enum Identifier {
+        static let toolbar = NSToolbar.Identifier("com.dapixelprowler.wxl23.main-toolbar")
+        static let tabs = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.tabs")
+        static let dashboard = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.dashboard")
+        static let wfoText = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.wfo-text")
+        static let clouds = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.clouds")
+        static let radar = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.radar")
+        static let more = NSToolbarItem.Identifier("com.dapixelprowler.wxl23.main-toolbar.more")
+    }
+
+    private weak var tabBarController: CustomTabBarVC?
+    private weak var tabGroup: NSToolbarItemGroup?
+    private let toolbar = NSToolbar(identifier: Identifier.toolbar)
+
+    init(tabBarController: CustomTabBarVC) {
+        self.tabBarController = tabBarController
+        super.init()
+        toolbar.delegate = self
+        toolbar.displayMode = .iconOnly
+        toolbar.allowsUserCustomization = false
+        if #available(macCatalyst 16.0, *) {
+            toolbar.centeredItemIdentifiers = [Identifier.tabs]
+        }
+    }
+
+    func install(in titlebar: UITitlebar) {
+        titlebar.toolbarStyle = .unifiedCompact
+        titlebar.toolbar = toolbar
+        titlebar.autoHidesToolbarInFullScreen = true
+        setSelectedTab(tabBarController?.selectedIndex ?? 0)
+    }
+
+    func setSelectedTab(_ index: Int) {
+        tabGroup?.selectedIndex = index
+    }
+
+    func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        var identifiers: [NSToolbarItem.Identifier] = [
+            Identifier.tabs,
+            .flexibleSpace,
+            Identifier.dashboard,
+            Identifier.wfoText,
+            Identifier.clouds
+        ]
+        if !UIPreferences.mainScreenRadarFab {
+            identifiers.append(Identifier.radar)
+        }
+        identifiers.append(Identifier.more)
+        return identifiers
+    }
+
+    func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+        [
+            Identifier.tabs,
+            Identifier.dashboard,
+            Identifier.wfoText,
+            Identifier.clouds,
+            Identifier.radar,
+            Identifier.more,
+            .flexibleSpace,
+            .space
+        ]
+    }
+
+    func toolbar(
+        _ toolbar: NSToolbar,
+        itemForItemIdentifier itemIdentifier: NSToolbarItem.Identifier,
+        willBeInsertedIntoToolbar flag: Bool
+    ) -> NSToolbarItem? {
+        switch itemIdentifier {
+        case Identifier.tabs:
+            return makeTabItem()
+        case Identifier.dashboard:
+            return makeActionItem(itemIdentifier, title: "Severe Dashboard", systemImageName: "exclamationmark.shield.fill") { controller in
+                Route.severeDashboard(controller)
+            }
+        case Identifier.wfoText:
+            return makeActionItem(itemIdentifier, title: "WFO Text", systemImageName: "doc.circle.fill") { controller in
+                Route.wfoText(controller)
+            }
+        case Identifier.clouds:
+            return makeActionItem(itemIdentifier, title: "Clouds", systemImageName: "cloud.fill") { controller in
+                Route.goes(controller)
+            }
+        case Identifier.radar:
+            return makeActionItem(itemIdentifier, title: "Radar", systemImageName: "bolt.fill") { controller in
+                Route.radarFromMainScreen(controller)
+            }
+        case Identifier.more:
+            return makeMoreItem(itemIdentifier)
+        default:
+            return nil
+        }
+    }
+
+    private func makeTabItem() -> NSToolbarItem {
+        let group = NSToolbarItemGroup(
+            itemIdentifier: Identifier.tabs,
+            titles: ["LOCAL", "SPC", "MISC"],
+            selectionMode: .selectOne,
+            labels: ["Local", "SPC", "Misc"],
+            target: self,
+            action: #selector(tabChanged(_:))
+        )
+        group.label = "Tabs"
+        group.paletteLabel = "Tabs"
+        group.visibilityPriority = .user
+        group.selectedIndex = tabBarController?.selectedIndex ?? 0
+        tabGroup = group
+        return group
+    }
+
+    private func makeActionItem(
+        _ itemIdentifier: NSToolbarItem.Identifier,
+        title: String,
+        systemImageName: String,
+        handler: @escaping (UIViewController) -> Void
+    ) -> NSToolbarItem {
+        let image = UIImage(systemName: systemImageName)
+        let action = UIAction(title: title, image: image) { [weak self] _ in
+            guard let controller = self?.activeController else { return }
+            handler(controller)
+        }
+        let barButtonItem = UIBarButtonItem(title: nil, image: image, primaryAction: action, menu: nil)
+        barButtonItem.accessibilityLabel = title
+
+        let item = NSToolbarItem(itemIdentifier: itemIdentifier, barButtonItem: barButtonItem)
+        item.label = title
+        item.paletteLabel = title
+        item.toolTip = title
+        item.visibilityPriority = .high
+        return item
+    }
+
+    private func makeMoreItem(_ itemIdentifier: NSToolbarItem.Identifier) -> NSToolbarItem {
+        let image = UIImage(systemName: "ellipsis")
+        let barButtonItem = UIBarButtonItem(
+            title: nil,
+            image: image,
+            primaryAction: nil,
+            menu: Route.subMenu { [weak self] in self?.activeController }
+        )
+        barButtonItem.accessibilityLabel = "More"
+
+        let item = NSToolbarItem(itemIdentifier: itemIdentifier, barButtonItem: barButtonItem)
+        item.label = "More"
+        item.paletteLabel = "More"
+        item.toolTip = "More"
+        item.visibilityPriority = .high
+        return item
+    }
+
+    private var activeController: UIViewController? {
+        guard let tabBarController else { return nil }
+        return tabBarController.selectedViewController ?? tabBarController
+    }
+
+    @objc private func tabChanged(_ sender: NSToolbarItemGroup) {
+        guard let tabBarController else { return }
+        guard let viewControllers = tabBarController.viewControllers else { return }
+        let selectedIndex = sender.selectedIndex
+        guard selectedIndex >= 0 && selectedIndex < viewControllers.count else { return }
+        tabBarController.selectedIndex = selectedIndex
+        setSelectedTab(selectedIndex)
+    }
+}
+#endif

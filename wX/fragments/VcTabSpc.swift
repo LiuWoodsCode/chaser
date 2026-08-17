@@ -38,7 +38,10 @@ final class VcTabSpc: VcTabParent {
     }
 
     override func updateColors() {
+        #if targetEnvironment(macCatalyst)
+        #else
         objTileMatrix.toolbar.setColorToTheme()
+        #endif
         super.updateColors()
     }
 }
