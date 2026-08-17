@@ -1,0 +1,124 @@
+// please see LICENSE.SunCalc in the root directory
+// minor modifications made by joshua.tee@gmaill.com
+
+import Foundation
+
+enum SolarEvent {
+    case sunrise
+    case sunset
+    case sunriseEnd
+    case sunsetEnd
+    case dawn
+    case dusk
+    case nauticalDawn
+    case nauticalDusk
+    case astronomicalDawn
+    case astronomicalDusk
+    case goldenHourEnd
+    case goldenHour
+    case noon
+    case nadir
+
+    var solarAngle: Double {
+        switch self {
+        case .sunrise, .sunset: return -0.833
+        case .sunriseEnd, .sunsetEnd: return -0.3
+        case .dawn, .dusk: return -6.0
+        case .nauticalDawn, .nauticalDusk: return -12.0
+        case .astronomicalDawn, .astronomicalDusk: return -18.0
+        case .goldenHourEnd, .goldenHour: return 6.0
+        case .noon: return 90.0
+        case .nadir: return -90.0
+        }
+    }
+}
+
+final class SunCalc {
+
+    enum SolarEventError: Error {
+        case sunNeverRise
+        case sunNeverSet
+    }
+
+    private static let e = 23.4397 * Double.radPerDegree
+
+    private static func declination(l: Double, b: Double) -> Double {
+        asin(sin(b) * cos(SunCalc.e) + cos(b) * sin(SunCalc.e) * sin(l))
+    }
+
+    private static func solarMeanAnomaly(_ d: Double) -> Double {
+        Double.radPerDegree * (357.5291 + 0.98560028 * d)
+    }
+
+    private static func eclipticLongitude(_ m: Double) -> Double {
+        let c = Double.radPerDegree * (1.9148 * sin(m) + 0.02 * sin(2.0 * m) + 0.0003 * sin(3.0 * m))
+        let p = Double.radPerDegree * 102.9372
+        return m + c + p + Double.pi
+    }
+
+    private static func julianCycle(d: Double, lw: Double) -> Double {
+        let v = (d - Date.j0) - (lw / (2.0 * Double.pi))
+        return v.rounded()
+    }
+
+    private static func approximateTransit(hT: Double, lw: Double, n: Double) -> Double {
+        Date.j0 + (hT + lw) / (2.0 * Double.pi) + n
+    }
+
+    private static func solarTransitJ(ds: Double, m: Double, l: Double) -> Double {
+        Date.j2000 + ds + 0.0053 * sin(m) - 0.0069 * sin(2.0 * l)
+    }
+
+    private static func hourAngle(h: Double, phi: Double, d: Double) throws -> Double {
+        let cosH = (sin(h) - sin(phi) * sin(d)) / (cos(phi) * cos(d))
+        if cosH > 1 {
+            throw SolarEventError.sunNeverRise
+        }
+        if cosH < -1 {
+            throw SolarEventError.sunNeverSet
+        }
+        return acos(cosH)
+    }
+
+    private static func getSetJ(
+        h: Double,
+        lw: Double,
+        phi: Double,
+        dec: Double,
+        n: Double,
+        m: Double,
+        l: Double
+    ) throws -> Double {
+        let w = try hourAngle(h: h, phi: phi, d: dec)
+        let a = approximateTransit(hT: w, lw: lw, n: n)
+        return solarTransitJ(ds: a, m: m, l: l)
+    }
+
+    static func time(_ date: Date, _ event: SolarEvent, _ latLon: LatLon) throws -> Date {
+        let lw = Double.radPerDegree * latLon.lon * -1.0
+        let phi = Double.radPerDegree * latLon.lat
+        let d = date.daysSince2000
+        let n = julianCycle(d: d, lw: lw)
+        let ds = approximateTransit(hT: 0.0, lw: lw, n: n)
+        let m = solarMeanAnomaly(ds)
+        let l = eclipticLongitude(m)
+        let dec = declination(l: l, b: 0.0)
+        let jNoon = solarTransitJ(ds: ds, m: m, l: l)
+        let noon = Date(julianDays: jNoon)
+        let angle = event.solarAngle
+        let jSet = try getSetJ(h: angle * Double.radPerDegree, lw: lw, phi: phi, dec: dec, n: n, m: m, l: l)
+        switch event {
+        case .noon: return noon
+        case .nadir:
+            let nadir = Date(julianDays: jNoon - 0.5)
+            return nadir
+        case .sunset, .dusk, .goldenHour, .astronomicalDusk, .nauticalDusk:
+            return Date(julianDays: jSet)
+        case .sunrise, .dawn, .goldenHourEnd, .astronomicalDawn, .nauticalDawn:
+            let jRise = jNoon - (jSet - jNoon)
+            return Date(julianDays: jRise)
+        default:
+            return Date()
+        }
+    }
+}

@@ -1,0 +1,5 @@
+brew tap peripheryapp/periphery
+brew cask install periphery
+
+periphery scan
+periphery scan-syntax wX

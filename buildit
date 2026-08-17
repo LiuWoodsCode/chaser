@@ -1,0 +1,24 @@
+#!/bin/bash
+dateString=$(date '+%Y/%m/%d %H:%M')
+dropBoxPath=${HOME}/Dropbox/wXL23
+#version=$(defaults read $HOME/wXL23/wX/wX/Info.plist  CFBundleShortVersionString)
+#version=$(grep CURRENT_VERSION doc/ChangeLog.txt|awk '{print $2}')
+version=$(grep MARKETING_VERSION  wX.xcodeproj/project.pbxproj | awk '{print $3}' | tr -d ';'|uniq)
+gitRepo="https://gitlab.com/joshua.tee/wxl23.git"
+APP_NAME="wxl23"
+tmpPath=${HOME}/tmp
+
+cd $HOME/wxl23
+touch doc/ChangeLog.md
+git commit -a -m "release ${version} commit ${dateString}"
+git push origin master
+
+mkdir ${tmpPath} || exit 1
+cd ${tmpPath} || exit 1
+git clone ${gitRepo}
+zip -r ${APP_NAME}_${version}.zip $APP_NAME -x *.git* > /dev/null
+ls -l ${APP_NAME}_${version}.zip 
+cp ${APP_NAME}_${version}.zip ${dropBoxPath}/
+rm -rf ${tmpPath} 
+echo Build Complete
+echo hdiutil create wXL23${version}.dmg -volname "wXL23${version}" -fs HFS+ -srcfolder "wX.app"

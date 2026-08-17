@@ -1,0 +1,37 @@
+// *****************************************************************************
+// Copyright (c)  2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024 joshua.tee@gmail.com. All rights reserved.
+//
+// Refer to the COPYING file of the official project for license.
+// *****************************************************************************
+
+import Foundation
+
+final class UtilityModelWpcGefsInputOutput {
+
+    static func getRunTime() -> RunTimeData {
+        let runData = RunTimeData()
+        let currentHour = ObjectDateTime.getCurrentHourInUTC()
+        runData.mostRecentRun = "00"
+        if currentHour >= 12 && currentHour < 18 {
+            runData.mostRecentRun = "06"
+        }
+        if currentHour >= 18 {
+            runData.mostRecentRun = "12"
+        }
+        if currentHour < 6 {
+            runData.mostRecentRun = "18"
+        }
+        runData.listRun = ["00", "06", "12", "18"]
+        runData.timeStringConversion = runData.mostRecentRun
+        return runData
+    }
+
+    static func getImage(_ om: ObjectModel) -> Bitmap {
+        var sectorAdd = ""
+        if om.sector == "AK" {
+            sectorAdd = "_ak"
+        }
+        let url = GlobalVariables.nwsWPCwebsitePrefix + "/exper/gefs/" + om.run + "/GEFS_" + om.param + "_" + om.run + "Z_f" + om.time + sectorAdd + ".gif"
+        return Bitmap(url)
+    }
+}

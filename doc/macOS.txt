@@ -1,0 +1,12 @@
+[TOC]
+
+### to clear prefs, run via CLI:
+```
+defaults delete maccatalyst.joshuatee.wXIOS
+```
+### simulator cleanup
+```
+xcrun simctl list devices
+xcrun simctl delete <device udid>
+xcrun simctl delete unavailable
+```

@@ -1,0 +1,13 @@
+
+The following individiduals provided open source software used in this project. Thankyou
+
+Mike Gavaghan - code used to plot angle/distance to lat/long ( storm track, etc )
+Joel Teply - HSBColorPicker 
+Nguyen Cong Huy - ImageScrollView
+Just contributors - Just - used to only download the first chunk of Level2 data
+University Corporation for Atmospheric Research/Unidata - substantial Level 2 decoder in Java was used as a basis for the Swift code in wXIOS
+Cezar Pereira - TabBarControllerSwipeExtension.swift
+Lee Sun-Hyoup https://github.com/kciter/Floaty/
+Venj Chu - https://github.com/imvenj/SunCalc.swift 
+Vladimir Agafonkin - https://github.com/mourner/suncalc
+Noah Gilmore - https://noahgilmore.com/blog/dark-mode-uicolor-compatibility/ ColorCompatibility

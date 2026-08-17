@@ -1,0 +1,91 @@
+// *****************************************************************************
+// Copyright (c)  2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024 joshua.tee@gmail.com. All rights reserved.
+//
+// Refer to the COPYING file of the official project for license.
+// *****************************************************************************
+
+final class NexradLevel3StormInfo {
+
+    static func decode(_ projectionNumbers: ProjectionNumbers, _ fileStorage: FileStorage) {
+        let rawData = NexradLevel3TextProduct.download("STI", projectionNumbers.getRadarSite())
+        var stormList = [Double]()
+        if rawData.count > 10 {
+            let position = rawData.parseColumn("AZ/RAN(.*?)V")
+            let motion = rawData.parseColumn("MVT(.*?)V")
+            // TODO .joined(), see kotlin version
+            var posnStr = ""
+            position.forEach {
+                posnStr += $0.replace("/", " ")
+            }
+            var motionStr = ""
+            motion.forEach {
+                motionStr += $0.replace("/", " ")
+            }
+            motionStr = motionStr.replace("NEW", "  0  0  ")
+            let reg = "(\\d+) "
+            let posnNumbers = posnStr.parseColumnAll(reg)
+            let motNumbers = motionStr.parseColumnAll(reg)
+            let sti15IncrLen = 0.40
+            let degreeShift = 180
+            let arrowLength = 2.0
+            let arrowBend = 20.0
+            if (posnNumbers.count == motNumbers.count) && posnNumbers.count > 1 {
+                stride(from: 0, to: posnNumbers.count - 2, by: 2).forEach { index in
+                    let degree = To.int(posnNumbers[index])
+                    let nm = To.int(posnNumbers[index + 1])
+                    let degree2 = To.double(motNumbers[index])
+                    let nm2 = To.int(motNumbers[index + 1])
+                    var start = ExternalGlobalCoordinates(projectionNumbers, lonNegativeOne: true)
+                    var ec = ExternalGeodeticCalculator.calculateEndingGlobalCoordinates(start, Double(degree), Double(nm) * 1852.0)
+                    stormList += Projection.computeMercatorNumbers(ec, projectionNumbers)
+                    start = ExternalGlobalCoordinates(ec)
+                    ec = ExternalGeodeticCalculator.calculateEndingGlobalCoordinates(start, Double(degree2) + Double(degreeShift), Double(nm2) * 1852.0)
+                    let tmpCoords = Projection.computeMercatorNumbers(ec, projectionNumbers)
+                    stormList += tmpCoords
+                    var ecArr = [ExternalGlobalCoordinates]()
+                    var latLons = [LatLon]()
+                    (0...3).forEach { z in
+                        ecArr.append(
+                            ExternalGeodeticCalculator.calculateEndingGlobalCoordinates(start, Double(degree2) + Double(degreeShift), Double(nm2) * 1852.0 * Double(z) * 0.25)
+                        )
+                        latLons.append(LatLon(Projection.computeMercatorNumbers(ecArr[z], projectionNumbers)))
+                    }
+                    let endPoint = tmpCoords
+                    if nm2 > 0 {
+                        start = ExternalGlobalCoordinates(ec)
+                        [degree2 + arrowBend, degree2 - arrowBend].forEach {
+                            stormList += NexradLevel3Common.drawLine(endPoint, projectionNumbers, start, $0, arrowLength * 1852.0)
+                        }
+                        // 15,30,45 min ticks
+                        let stormTrackTickMarkAngleOff90 = 30.0
+                        (0...3).forEach { index in
+                            [
+                                degree2 - (90.0 + stormTrackTickMarkAngleOff90),
+                                degree2 + (90.0 - stormTrackTickMarkAngleOff90),
+                                degree2 - (90.0 - stormTrackTickMarkAngleOff90),
+                                degree2 + (90.0 + stormTrackTickMarkAngleOff90)
+                                ].forEach {
+                                    stormList += drawTickMarks(latLons[index], projectionNumbers, ecArr[index], $0, arrowLength * 1852.0 * sti15IncrLen)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        fileStorage.stiList = stormList
+    }
+
+    private static func drawTickMarks(
+        _ startPoint: LatLon,
+        _ projectionNumbers: ProjectionNumbers,
+        _ ecArr: ExternalGlobalCoordinates,
+        _ startBearing: Double,
+        _ distance: Double
+    ) -> [Double] {
+        var list = startPoint.list
+        let start = ExternalGlobalCoordinates(ecArr)
+        let ec = ExternalGeodeticCalculator.calculateEndingGlobalCoordinates(start, startBearing, distance)
+        list += Projection.computeMercatorNumbers(ec, projectionNumbers)
+        return list
+    }
+}
