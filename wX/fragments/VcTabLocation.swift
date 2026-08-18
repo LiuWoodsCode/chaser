@@ -33,11 +33,12 @@ final class VcTabLocation: VcTabParent {
     private var extraDataCards = [CardHomeScreen]()
     private var toolbar = Toolbar()
     private var globalHomeScreenFav = ""
+    private var globalHomeScreenLeftPaneFav = ""
+    private var globalHomeScreenRightPaneFav = ""
+    private var globalHomeScreenPanesConfigured = "false"
     private var globalTextViewFontSize: CGFloat = 0.0
     private var globalHomeScreenRedesign = false
     private var globalHomeScreenUsesTwoPanels = false
-    private var homeScreenFavHasRightPanelWidgets = false
-    private var homeScreenWidgetIndex = 0
     private let homeScreenRedesignInset: CGFloat = 10.0
     private let homeScreenRedesignSpacing: CGFloat = 8.0
     private let downloadTimer = DownloadTimer("MAIN_LOCATION_TAB")
@@ -47,12 +48,7 @@ final class VcTabLocation: VcTabParent {
     #endif
 
     private var homeScreenUsesTwoPanels: Bool {
-        guard UIPreferences.homeScreenRedesign else { return false }
-        #if targetEnvironment(macCatalyst)
-        return true
-        #else
-        return UIDevice.current.userInterfaceIdiom == .pad
-        #endif
+        UtilityHomeScreen.usesTwoPaneRedesign
     }
 
     private var homeScreenHorizontalPadding: CGFloat {
@@ -130,7 +126,7 @@ final class VcTabLocation: VcTabParent {
             object: nil
         )
         setupToolbar()
-        globalHomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
+        updateHomeScreenPreferenceCache()
         globalTextViewFontSize = UIPreferences.textviewFontSize
         getContentSuper()
         #if targetEnvironment(macCatalyst)
@@ -195,9 +191,17 @@ final class VcTabLocation: VcTabParent {
         if homeScreenUsesTwoPanels {
             setupHomeScreenPanels()
         }
+        updateHomeScreenPreferenceCache()
         globalHomeScreenRedesign = UIPreferences.homeScreenRedesign
         globalHomeScreenUsesTwoPanels = homeScreenUsesTwoPanels
         globalTextViewFontSize = UIPreferences.textviewFontSize
+    }
+
+    private func updateHomeScreenPreferenceCache() {
+        globalHomeScreenFav = Utility.readPref(UtilityHomeScreen.favoritesPreference, GlobalVariables.homescreenFavDefault)
+        globalHomeScreenLeftPaneFav = Utility.readPref(UtilityHomeScreen.leftPanePreference, "")
+        globalHomeScreenRightPaneFav = Utility.readPref(UtilityHomeScreen.rightPanePreference, "")
+        globalHomeScreenPanesConfigured = Utility.readPref(UtilityHomeScreen.panesConfiguredPreference, "false")
     }
 
     private func setupHomeScreenPanels() {
@@ -211,21 +215,20 @@ final class VcTabLocation: VcTabParent {
         homePanelRow.get().widthAnchor.constraint(equalTo: boxMain.widthAnchor, constant: -2.0 * homeScreenRedesignInset).isActive = true
     }
 
-    private func addHomeBox(_ layout: VBox, for favorite: String) {
-        if homeScreenUsesTwoPanels {
-            let panel = homeScreenPanel(for: favorite)
+    private func addHomeBox(_ layout: VBox, to pane: UtilityHomeScreen.Pane? = nil) {
+        if homeScreenUsesTwoPanels, let pane {
+            let panel = homeScreenPanel(pane)
             panel.addLayout(layout)
             layout.widthAnchor.constraint(equalTo: panel.widthAnchor).isActive = true
         } else {
             boxMain.addLayout(layout)
             layout.widthAnchor.constraint(equalTo: boxMain.widthAnchor, constant: -2.0 * homeScreenHorizontalPadding).isActive = true
         }
-        homeScreenWidgetIndex += 1
     }
 
-    private func addHomeCard(_ card: CardHomeScreen, for favorite: String) {
-        if homeScreenUsesTwoPanels {
-            let panel = homeScreenPanel(for: favorite)
+    private func addHomeCard(_ card: CardHomeScreen, to pane: UtilityHomeScreen.Pane? = nil) {
+        if homeScreenUsesTwoPanels, let pane {
+            let panel = homeScreenPanel(pane)
             panel.addLayout(card)
             card.setupWithPadding(panel, redesign: UIPreferences.homeScreenRedesign)
         } else {
@@ -236,28 +239,15 @@ final class VcTabLocation: VcTabParent {
                 redesign: UIPreferences.homeScreenRedesign
             )
         }
-        homeScreenWidgetIndex += 1
     }
 
-    private func homeScreenPanel(for favorite: String) -> VBox {
-        if shouldPlaceInRightPanel(favorite) {
+    private func homeScreenPanel(_ pane: UtilityHomeScreen.Pane) -> VBox {
+        switch pane {
+        case .left:
+            return homeLeftPanel
+        case .right:
             return homeRightPanel
         }
-        return homeLeftPanel
-    }
-
-    private func shouldPlaceInRightPanel(_ favorite: String) -> Bool {
-        if isRightPanelPreferredWidget(favorite) {
-            return true
-        }
-        if homeScreenFavHasRightPanelWidgets {
-            return false
-        }
-        return homeScreenWidgetIndex % 2 == 1
-    }
-
-    private func isRightPanelPreferredWidget(_ favorite: String) -> Bool {
-        favorite == "METAL-RADAR" || favorite.hasPrefix("IMG-")
     }
 
     private func homeScreenRadarWidth() -> CGFloat {
@@ -313,35 +303,40 @@ final class VcTabLocation: VcTabParent {
     }
 
     private func mainDisplay() {
-        globalHomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
-        let homescreenFav = WString.split(globalHomeScreenFav, ":")
-        homeScreenFavHasRightPanelWidgets = homescreenFav.contains { isRightPanelPreferredWidget($0) }
-        homeScreenWidgetIndex = 0
+        updateHomeScreenPreferenceCache()
         textProductLong = [:]
-        homescreenFav.forEach { favorite in
-            switch favorite {
-            case "TXT-CC2":
-                addHomeBox(boxCc, for: favorite)
-            case "TXT-HAZ":
-                addHomeBox(boxHazards, for: favorite)
-            case "TXT-7DAY2":
-                addHomeBox(boxSevenDay, for: favorite)
-            case "METAL-RADAR":
-                cardRadar = CardHomeScreen()
-                addHomeCard(cardRadar, for: favorite)
-                nexradTab.uiv = self
-                nexradTab.getNexradRadar(cardRadar.get(), width: homeScreenRadarWidth())
-            default:
-                let cardHomeScreen = CardHomeScreen()
-                addHomeCard(cardHomeScreen, for: favorite)
-                extraDataCards.append(cardHomeScreen)
-                if favorite.hasPrefix("TXT-") {
-                    let product = favorite.replace("TXT-", "")
-                    getContentText(product, cardHomeScreen)
-                } else if favorite.hasPrefix("IMG-") {
-                    let product = favorite.replace("IMG-", "")
-                    getContentImage(product, cardHomeScreen)
-                }
+        if homeScreenUsesTwoPanels {
+            let paneFavorites = UtilityHomeScreen.getPaneFavorites()
+            paneFavorites.left.forEach { displayHomeScreenFavorite($0, in: .left) }
+            paneFavorites.right.forEach { displayHomeScreenFavorite($0, in: .right) }
+        } else {
+            UtilityHomeScreen.getFavorites().forEach { displayHomeScreenFavorite($0) }
+        }
+    }
+
+    private func displayHomeScreenFavorite(_ favorite: String, in pane: UtilityHomeScreen.Pane? = nil) {
+        switch favorite {
+        case "TXT-CC2":
+            addHomeBox(boxCc, to: pane)
+        case "TXT-HAZ":
+            addHomeBox(boxHazards, to: pane)
+        case "TXT-7DAY2":
+            addHomeBox(boxSevenDay, to: pane)
+        case "METAL-RADAR":
+            cardRadar = CardHomeScreen()
+            addHomeCard(cardRadar, to: pane)
+            nexradTab.uiv = self
+            nexradTab.getNexradRadar(cardRadar.get(), width: homeScreenRadarWidth())
+        default:
+            let cardHomeScreen = CardHomeScreen()
+            addHomeCard(cardHomeScreen, to: pane)
+            extraDataCards.append(cardHomeScreen)
+            if favorite.hasPrefix("TXT-") {
+                let product = favorite.replace("TXT-", "")
+                getContentText(product, cardHomeScreen)
+            } else if favorite.hasPrefix("IMG-") {
+                let product = favorite.replace("IMG-", "")
+                getContentImage(product, cardHomeScreen)
             }
         }
     }
@@ -382,13 +377,20 @@ final class VcTabLocation: VcTabParent {
         super.viewWillAppear(UIPreferences.backButtonAnimation)
         updateColors()
         updateLocationHeaderText()
-        let newhomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
+        let newhomeScreenFav = Utility.readPref(UtilityHomeScreen.favoritesPreference, GlobalVariables.homescreenFavDefault)
+        let newHomeScreenLeftPaneFav = Utility.readPref(UtilityHomeScreen.leftPanePreference, "")
+        let newHomeScreenRightPaneFav = Utility.readPref(UtilityHomeScreen.rightPanePreference, "")
+        let newHomeScreenPanesConfigured = Utility.readPref(UtilityHomeScreen.panesConfiguredPreference, "false")
         let textSizeHasChange = abs(UIPreferences.textviewFontSize - globalTextViewFontSize) > 0.5
         let homeScreenRedesignHasChanged = UIPreferences.homeScreenRedesign != globalHomeScreenRedesign
         let homeScreenPanelLayoutHasChanged = homeScreenUsesTwoPanels != globalHomeScreenUsesTwoPanels
+        let homeScreenPaneSettingsHaveChanged = newHomeScreenLeftPaneFav != globalHomeScreenLeftPaneFav
+            || newHomeScreenRightPaneFav != globalHomeScreenRightPaneFav
+            || newHomeScreenPanesConfigured != globalHomeScreenPanesConfigured
         Location.checkCurrentLocationValidity()
         if (Location.latLon != oldLocation)
             || (newhomeScreenFav != globalHomeScreenFav)
+            || homeScreenPaneSettingsHaveChanged
             || textSizeHasChange
             || homeScreenRedesignHasChanged
             || homeScreenPanelLayoutHasChanged

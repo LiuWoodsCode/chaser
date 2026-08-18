@@ -9,7 +9,10 @@ import UIKit
 final class UtilitySettings {
 
     static func isRadarInHomeScreen() -> Bool {
-        let homeScreenFav = WString.split(Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault), ":")
-        return homeScreenFav.contains("METAL-RADAR")
+        if UtilityHomeScreen.usesTwoPaneRedesign {
+            let paneFavorites = UtilityHomeScreen.getPaneFavorites()
+            return paneFavorites.left.contains("METAL-RADAR") || paneFavorites.right.contains("METAL-RADAR")
+        }
+        return UtilityHomeScreen.getFavorites().contains("METAL-RADAR")
     }
 }

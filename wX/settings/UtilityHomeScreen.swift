@@ -8,6 +8,16 @@ import UIKit
 
 final class UtilityHomeScreen {
 
+    enum Pane: String {
+        case left
+        case right
+    }
+
+    static let favoritesPreference = "HOMESCREEN_FAV"
+    static let leftPanePreference = "HOMESCREEN_FAV_LEFT"
+    static let rightPanePreference = "HOMESCREEN_FAV_RIGHT"
+    static let panesConfiguredPreference = "HOMESCREEN_PANES_CONFIGURED"
+
     static let localChoicesText = [
         "METAL-RADAR": "Local NEXRAD Radar",
         "TXT-AFDLOC": "Area Forecast Discussion",
@@ -26,6 +36,87 @@ final class UtilityHomeScreen {
         "RTMA_TEMP: Real-Time Mesoscale Analysis Temperature",
         "RTMA_WIND: Real-Time Mesoscale Analysis Wind"
     ]
+
+    static var usesTwoPaneRedesign: Bool {
+        guard UIPreferences.homeScreenRedesign else { return false }
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+    }
+
+    static func getFavorites() -> [String] {
+        splitFavorites(Utility.readPref(favoritesPreference, GlobalVariables.homescreenFavDefault))
+    }
+
+    static func getPaneFavorites() -> (left: [String], right: [String]) {
+        if Utility.readPref(panesConfiguredPreference, "false").hasPrefix("t") {
+            return (
+                splitFavorites(Utility.readPref(leftPanePreference, "")),
+                splitFavorites(Utility.readPref(rightPanePreference, ""))
+            )
+        }
+        return splitIntoPaneFavorites(getFavorites())
+    }
+
+    static func splitFavorites(_ favorites: String) -> [String] {
+        if favorites.isEmpty {
+            return []
+        }
+        let normalizedFavorites = favorites.hasSuffix(":") ? favorites : favorites + ":"
+        return WString.split(normalizedFavorites, ":")
+    }
+
+    static func writeFavorites(_ favorites: [String]) {
+        Utility.writePref(favoritesPreference, WString.join(":", favorites))
+        GlobalVariables.editor.removeObject(leftPanePreference)
+        GlobalVariables.editor.removeObject(rightPanePreference)
+        Utility.writePref(panesConfiguredPreference, "false")
+    }
+
+    static func writePaneFavorites(left: [String], right: [String]) {
+        Utility.writePref(leftPanePreference, WString.join(":", left))
+        Utility.writePref(rightPanePreference, WString.join(":", right))
+        Utility.writePref(panesConfiguredPreference, "true")
+        Utility.writePref(favoritesPreference, WString.join(":", left + right))
+    }
+
+    static func splitIntoPaneFavorites(_ favorites: [String]) -> (left: [String], right: [String]) {
+        var left = [String]()
+        var right = [String]()
+        let hasRightPanePreferredWidgets = favorites.contains { prefersRightPane($0) }
+        favorites.enumerated().forEach { index, favorite in
+            if prefersRightPane(favorite) {
+                right.append(favorite)
+            } else if hasRightPanePreferredWidgets {
+                left.append(favorite)
+            } else if index % 2 == 0 {
+                left.append(favorite)
+            } else {
+                right.append(favorite)
+            }
+        }
+        return (left, right)
+    }
+
+    static func prefersRightPane(_ favorite: String) -> Bool {
+        favorite == "METAL-RADAR" || favorite.hasPrefix("IMG-")
+    }
+
+    static func title(for prefVar: String) -> String {
+        if let title = localChoicesText[prefVar] {
+            return title.trim()
+        }
+        let prefVarMod = prefVar.replace("TXT-", "").replace("IMG-", "")
+        for label in localChoicesImages + GlobalArrays.nwsImageProducts where label.hasPrefix(prefVarMod + ":") {
+            return label.split(":")[1].trim()
+        }
+        for label in UtilityWpcText.labelsWithCodes where label.hasPrefix(prefVarMod + ":") {
+            return label.split(":")[1].trim()
+        }
+        return prefVar
+    }
 
     static func jumpToActivity(_ uiv: UIViewController, _ homeScreenToken: String) {
         switch homeScreenToken {
