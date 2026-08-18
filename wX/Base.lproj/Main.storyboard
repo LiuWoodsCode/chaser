@@ -37,7 +37,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="MISC" id="X84-BG-t0v"/>
+                    <tabBarItem key="tabBarItem" title="Misc" id="X84-BG-t0v"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ILk-u9-few" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -56,7 +56,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="LOCAL" id="3NR-6W-E7q"/>
+                    <tabBarItem key="tabBarItem" title="Home" id="3NR-6W-E7q"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="vHx-xq-1ZL" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
