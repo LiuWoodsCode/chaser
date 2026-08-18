@@ -37,14 +37,15 @@ final class PopUp {
                      _ button: UIBarButtonItem,
                      _ list: [String],
                      _ fn: @escaping (String) -> Void,
+                     prefersCatalystList: Bool = false
     ) {
-        self.init(uiv, button, title)
+        self.init(uiv, button, title, prefersCatalystList: prefersCatalystList)
         list.forEach { item in
             var code = item
             if item.contains(":") {
                 code = item.firstToken(":")
             }
-            add(UIAlertAction(item) { _ in fn(code) })
+            add(Action(item) { fn(code) })
         }
         finish()
     }
@@ -53,11 +54,12 @@ final class PopUp {
                      title: String = "Product Selection",
                      _ button: UIBarButtonItem,
                      _ list: [Int],
-                     _ fn: @escaping (Int) -> Void
+                     _ fn: @escaping (Int) -> Void,
+                     prefersCatalystList: Bool = false
     ) {
-        self.init(uiv, button, title)
+        self.init(uiv, button, title, prefersCatalystList: prefersCatalystList)
         list.forEach { item in
-            add(UIAlertAction(To.string(item)) { _ in fn(item) })
+            add(Action(To.string(item)) { fn(item) })
         }
         finish()
     }
@@ -66,12 +68,13 @@ final class PopUp {
                      title: String = "Product Selection",
                      _ button: UIBarButtonItem,
                      _ list: [String],
-                     _ fn: @escaping (Int) -> Void
+                     _ fn: @escaping (Int) -> Void,
+                     prefersCatalystList: Bool = false
     ) {
-        self.init(uiv, button, title)
+        self.init(uiv, button, title, prefersCatalystList: prefersCatalystList)
         list.forEach { item in
             let index = list.firstIndex(of: item)!
-            add(UIAlertAction(item) { _ in fn(index) })
+            add(Action(item) { fn(index) })
         }
         finish()
     }
@@ -80,11 +83,12 @@ final class PopUp {
                      _ title: String,
                      _ button: UIBarButtonItem,
                      _ list: [MenuTitle],
-                     _ fn: @escaping (Int) -> Void
+                     _ fn: @escaping (Int) -> Void,
+                     prefersCatalystList: Bool = false
     ) {
-        self.init(uiv, button, title)
+        self.init(uiv, button, title, prefersCatalystList: prefersCatalystList)
         list.enumerated().forEach { index, title in
-            add(UIAlertAction(title.title) { _ in fn(index) })
+            add(Action(title.title) { fn(index) })
         }
         finish()
     }
@@ -94,15 +98,16 @@ final class PopUp {
                      _ list: [MenuTitle],
                      _ index: Int,
                      _ menuData: MenuData,
-                     _ fn: @escaping (Int) -> Void
+                     _ fn: @escaping (Int) -> Void,
+                     prefersCatalystList: Bool = false
     ) {
         let title = list[index].title
-        self.init(uiv, button, title)
+        self.init(uiv, button, title, prefersCatalystList: prefersCatalystList)
         let startIdx = MenuTitle.getStart(list, index)
         let count = list[index].count
         (startIdx..<(startIdx + count)).forEach { idx in
             let paramTitle = menuData.paramLabels[idx]
-            alert.addAction(UIAlertAction(paramTitle) { _ in fn(idx) })
+            add(Action(paramTitle) { fn(idx) })
         }
         finish()
     }
