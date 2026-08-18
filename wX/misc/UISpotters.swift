@@ -11,7 +11,9 @@ struct UISpotters: View {
     @State private var spotterData: [Spotter] = []
 
     init() {
-        UIToolbar.appearance().barTintColor = getColorToThemeAsUIColor()
+        if #unavailable(iOS 26) {
+            UIToolbar.appearance().barTintColor = getColorToThemeAsUIColor()
+        }
     }
 
     var body: some View {

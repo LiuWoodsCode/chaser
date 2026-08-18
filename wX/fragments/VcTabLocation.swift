@@ -83,7 +83,11 @@ final class VcTabLocation: VcTabParent {
         #if targetEnvironment(macCatalyst)
         topSpace = UtilityUI.getTopPadding()
         #else
-        topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
+        if #available(iOS 26, *) {
+            topSpace = 0.0
+        } else {
+            topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
+        }
         #endif
         if objScrollStackView != nil && objScrollStackView!.fragmentHeightAnchor1 != nil {
             view.removeConstraints([
@@ -114,6 +118,7 @@ final class VcTabLocation: VcTabParent {
                 objScrollStackView!.fragmentWidthAnchor1!,
                 objScrollStackView!.fragmentWidthAnchor2!
             ])
+            ScrollStackView.applyTopToolbarContentInset(to: scrollView)
         }
     }
 

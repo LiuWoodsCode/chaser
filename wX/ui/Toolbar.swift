@@ -43,6 +43,11 @@ final class Toolbar: UIToolbar {
     }
 
     func setColorToTheme() {
+        if #available(iOS 26, *) {
+            useSystemLiquidGlassAppearance()
+            return
+        }
+
         barTintColor = UIColor(
             red: AppColors.primaryColorRed,
             green: AppColors.primaryColorGreen,
@@ -52,8 +57,22 @@ final class Toolbar: UIToolbar {
     }
 
     func setTransparent() {
+        if #available(iOS 26, *) {
+            useSystemLiquidGlassAppearance()
+            return
+        }
+
         setBackgroundImage(UIImage(), forToolbarPosition: .any, barMetrics: .default)
         setShadowImage(UIImage(), forToolbarPosition: .any)
+    }
+
+    private func useSystemLiquidGlassAppearance() {
+        barTintColor = nil
+        backgroundColor = nil
+        isTranslucent = true
+        setBackgroundImage(nil, forToolbarPosition: .any, barMetrics: .default)
+        setBackgroundImage(nil, forToolbarPosition: .any, barMetrics: .compact)
+        setShadowImage(nil, forToolbarPosition: .any)
     }
 
     var height: CGFloat { frame.size.height }

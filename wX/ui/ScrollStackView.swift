@@ -13,6 +13,31 @@ final class ScrollStackView {
     var fragmentWidthAnchor1: NSLayoutConstraint?
     var fragmentWidthAnchor2: NSLayoutConstraint?
 
+    static func applyTopToolbarContentInset(to scrollView: UIScrollView) {
+        #if targetEnvironment(macCatalyst)
+        return
+        #else
+        if #available(iOS 26, *) {
+            let topInset = UIPreferences.toolbarHeight
+            let previousTopInset = scrollView.contentInset.top
+            let wasAtTop = scrollView.contentOffset.y <= -previousTopInset + 1.0
+
+            var contentInset = scrollView.contentInset
+            var verticalScrollIndicatorInsets = scrollView.verticalScrollIndicatorInsets
+            guard abs(contentInset.top - topInset) > 0.5 || abs(verticalScrollIndicatorInsets.top - topInset) > 0.5 else { return }
+
+            contentInset.top = topInset
+            verticalScrollIndicatorInsets.top = topInset
+            scrollView.contentInset = contentInset
+            scrollView.verticalScrollIndicatorInsets = verticalScrollIndicatorInsets
+
+            if wasAtTop {
+                scrollView.contentOffset.y = -topInset
+            }
+        }
+        #endif
+    }
+
     init(_ uiv: UIwXViewController) {
         uiv.scrollView.backgroundColor = ColorCompatibility.systemGray5
         uiv.scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -54,7 +79,7 @@ final class ScrollStackView {
         topSpace = UtilityUI.getTopPadding()
         #else
         if #available(iOS 26, *) {
-            topSpace = UtilityUI.getTopPadding()
+            topSpace = 0.0
         } else {
             topSpace = UtilityUI.getTopPadding() + UIPreferences.toolbarHeight
         }
@@ -74,6 +99,7 @@ final class ScrollStackView {
         fragmentWidthAnchor1 = scrollView.leadingAnchor.constraint(equalTo: uiv.view.leadingAnchor)
         fragmentWidthAnchor2 = scrollView.widthAnchor.constraint(equalTo: uiv.view.widthAnchor)
         uiv.view.addConstraints([fragmentHeightAnchor1!, fragmentHeightAnchor2!, fragmentWidthAnchor1!, fragmentWidthAnchor2!])
+        Self.applyTopToolbarContentInset(to: scrollView)
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.spacing = UIPreferences.stackviewCardSpacing

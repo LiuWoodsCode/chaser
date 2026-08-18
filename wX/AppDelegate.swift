@@ -19,10 +19,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         MyApplication.onCreate()
         window?.tintColor = Color.rgbToUIColor(0, 0, 0)
-        let color = Color.rgbToUIColor(204, 204, 204)
-        UINavigationBar.appearance().barTintColor = color
-        UIToolbar.appearance().barTintColor = color
-        UITabBar.appearance().barTintColor = color
+        if #unavailable(iOS 26) {
+            let color = Color.rgbToUIColor(204, 204, 204)
+            UINavigationBar.appearance().barTintColor = color
+            UIToolbar.appearance().barTintColor = color
+            UITabBar.appearance().barTintColor = color
+        }
         // window = UIWindow(frame: UIScreen.main.bounds)
         // window?.rootViewController = UINavigationController(rootViewController: CustomTabBarVC())
         // window?.makeKeyAndVisible()
