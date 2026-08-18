@@ -13,12 +13,15 @@ final class TextLarge: Widget {
     init(
         _ textPadding: Int,
         _ text: String = "",
-        _ color: UIColor = ColorCompatibility.label
+        _ color: UIColor = ColorCompatibility.label,
+        constrainToScreenWidth: Bool = true
     ) {
         self.text = text
         tv.translatesAutoresizingMaskIntoConstraints = false
-        let (width, _) = UtilityUI.getScreenBoundsCGFloat()
-        tv.widthAnchor.constraint(equalToConstant: width - CGFloat(textPadding)).isActive = true
+        if constrainToScreenWidth {
+            let (width, _) = UtilityUI.getScreenBoundsCGFloat()
+            tv.widthAnchor.constraint(equalToConstant: width - CGFloat(textPadding)).isActive = true
+        }
         tv.font = FontSize.medium.size
         tv.adjustsFontSizeToFitWidth = true
         tv.textColor = color

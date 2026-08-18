@@ -36,15 +36,16 @@ final class NexradStateHS {
         commandQueue = device?.makeCommandQueue()
     }
 
-    func setupMetalLayer(_ stackView: UIStackView) {
+    func setupMetalLayer(_ stackView: UIStackView, width: CGFloat? = nil) {
         let paneRange = [0]
-        let (width, _) = UtilityUI.getScreenBoundsCGFloat()
-        let screenWidth = width
+        let (defaultWidth, _) = UtilityUI.getScreenBoundsCGFloat()
+        let screenWidth = max(width ?? defaultWidth, 1.0)
         let screenHeight = screenWidth
-        let carect = CGRect(x: 0, y: 0, width: CGFloat(screenWidth), height: CGFloat(screenWidth))
+        let carect = CGRect(x: 0, y: 0, width: screenWidth, height: screenWidth)
         let caview = UIView(frame: carect)
-        caview.widthAnchor.constraint(equalToConstant: CGFloat(screenWidth)).isActive = true
-        caview.heightAnchor.constraint(equalToConstant: CGFloat(screenWidth)).isActive = true
+        caview.translatesAutoresizingMaskIntoConstraints = false
+        caview.widthAnchor.constraint(equalToConstant: screenWidth).isActive = true
+        caview.heightAnchor.constraint(equalToConstant: screenWidth).isActive = true
         let surfaceRatio = Float(screenWidth) / Float(screenHeight)
         projectionMatrix = float4x4.makeOrtho(
             -1.0 * ortInt,

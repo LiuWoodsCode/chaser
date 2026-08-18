@@ -26,6 +26,7 @@ final class UIPreferences {
     static var homescreenTextLength = 500
     static var radarToolbarTransparent = true
     static var mainScreenCondense = false
+    static var homeScreenRedesign = false
     static var nwsIconSize: Float = 80.0
     static var goesUseFullResolutionImages = false
     static var useNwsApi = true
@@ -58,6 +59,7 @@ final class UIPreferences {
         textviewFontSize = CGFloat(Utility.readPrefInt("TEXTVIEW_FONT_SIZE", Int(textviewFontSize)))
         radarToolbarTransparent = Utility.readPref("RADAR_TOOLBAR_TRANSPARENT", "true").hasPrefix("t")
         mainScreenCondense = Utility.readPref("UI_MAIN_SCREEN_CONDENSE", "false").hasPrefix("t")
+        homeScreenRedesign = Utility.readPref("HOME_SCREEN_REDESIGN", "false").hasPrefix("t")
         nwsIconSize = Utility.readPrefFloat("NWS_ICON_SIZE_PREF", 68.0)
         animInterval = Utility.readPrefInt("ANIM_INTERVAL", 6)
         playlistStr = Utility.readPref("PLAYLIST", "")

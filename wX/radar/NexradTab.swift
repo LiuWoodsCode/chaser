@@ -15,9 +15,9 @@ final class NexradTab {
     let nexradStateHS = NexradStateHS()
     private var nexradTabLongPressMenu: NexradTabLongPressMenu!
 
-    func getNexradRadar(_ stackView: UIStackView) {
+    func getNexradRadar(_ stackView: UIStackView, width: CGFloat? = nil) {
         nexradStateHS.setupMetal()
-        nexradStateHS.setupMetalLayer(stackView)
+        nexradStateHS.setupMetalLayer(stackView, width: width)
         nexradTabLongPressMenu = NexradTabLongPressMenu(uiv, nexradStateHS, radarSiteChanged)
         setupGestures()
         nexradStateHS.getRadar(render)

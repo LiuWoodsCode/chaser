@@ -16,6 +16,7 @@ final class VcSettingsExperimental: UIwXViewController {
         objScrollStackView = ScrollStackView(self)
         boxMain.constrain(self)
         display()
+        UIPreferences.settingsUIVisitedNeedRefresh = true
     }
 
     override func doneClicked() {
@@ -26,6 +27,7 @@ final class VcSettingsExperimental: UIwXViewController {
     private func display() {
         switches.removeAll()
         switches.append(Switch(boxMain, "NEXRAD_USE_MAPKIT_BASE_LAYER", "NEXRAD radar uses MapKit base layer", "false"))
+        switches.append(Switch(boxMain, "HOME_SCREEN_REDESIGN", "Home screen redesign", "false"))
     }
 
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {

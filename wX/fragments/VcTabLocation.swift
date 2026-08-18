@@ -17,10 +17,16 @@ final class VcTabLocation: VcTabParent {
     private var sevenDay = SevenDay()
     private var textProductLong = [String: String]()
     private var oldLocation = LatLon()
-    private var locationLabel = Text()
+    private var locationHeaderView = UIView()
+    private var locationText = Text()
+    private var locationLabel = UILabelInset()
+    private var locationIcon = UIImageView()
     private var boxCc = VBox()
     private var boxSevenDay = VBox()
     private var boxHazards = VBox()
+    private var homePanelRow = HBox(.fillEqually)
+    private var homeLeftPanel = VBox()
+    private var homeRightPanel = VBox()
     var cardRadar = CardHomeScreen()
     private var cardCurrentConditions: CardCurrentConditions?
     private var sevenDayCollection: SevenDayCollection?
@@ -28,11 +34,34 @@ final class VcTabLocation: VcTabParent {
     private var toolbar = Toolbar()
     private var globalHomeScreenFav = ""
     private var globalTextViewFontSize: CGFloat = 0.0
+    private var globalHomeScreenRedesign = false
+    private var globalHomeScreenUsesTwoPanels = false
+    private var homeScreenFavHasRightPanelWidgets = false
+    private var homeScreenWidgetIndex = 0
+    private let homeScreenRedesignInset: CGFloat = 10.0
+    private let homeScreenRedesignSpacing: CGFloat = 8.0
     private let downloadTimer = DownloadTimer("MAIN_LOCATION_TAB")
     private var nexradTab = NexradTab()
     #if targetEnvironment(macCatalyst)
     private var oneMinRadarFetch = Timer()
     #endif
+
+    private var homeScreenUsesTwoPanels: Bool {
+        guard UIPreferences.homeScreenRedesign else { return false }
+        #if targetEnvironment(macCatalyst)
+        return true
+        #else
+        return UIDevice.current.userInterfaceIdiom == .pad
+        #endif
+    }
+
+    private var homeScreenHorizontalPadding: CGFloat {
+        UIPreferences.homeScreenRedesign ? homeScreenRedesignInset : 0.0
+    }
+
+    private var homeScreenWidgetSpacing: CGFloat {
+        UIPreferences.homeScreenRedesign ? homeScreenRedesignSpacing : UIPreferences.stackviewCardSpacing
+    }
 
     func setupMenu() {
         let action1 = UIAction(title: "Option 1", image: UIImage(systemName: "hand.point.right.fill")) { _ in
@@ -49,7 +78,7 @@ final class VcTabLocation: VcTabParent {
         super.viewDidLayoutSubviews()
 //        scrollView.backgroundColor = ColorCompatibility.systemGray5
         scrollView.backgroundColor = AppColors.primaryBackgroundBlueUIColor
-        boxMain.getView().backgroundColor = ColorCompatibility.systemGray5
+        boxMain.getView().backgroundColor = UIPreferences.homeScreenRedesign ? AppColors.primaryBackgroundBlueUIColor : ColorCompatibility.systemGray5
         #if targetEnvironment(macCatalyst)
         #else
         toolbar.resize(uiv: self)
@@ -103,7 +132,6 @@ final class VcTabLocation: VcTabParent {
         setupToolbar()
         globalHomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
         globalTextViewFontSize = UIPreferences.textviewFontSize
-        addLocationCard()
         getContentSuper()
         #if targetEnvironment(macCatalyst)
         oneMinRadarFetch = Timer.scheduledTimer(
@@ -141,9 +169,107 @@ final class VcTabLocation: VcTabParent {
 
     @objc func getContentSuper() {
         oldLocation = Location.latLon
-        clearViews()
+        resetHomeScreenLayout()
         getForecastData()
         mainDisplay()
+    }
+
+    private func resetHomeScreenLayout() {
+        boxMain.removeArrangedViews()
+        boxMain.get().spacing = homeScreenWidgetSpacing
+        boxMain.getView().backgroundColor = UIPreferences.homeScreenRedesign ? AppColors.primaryBackgroundBlueUIColor : ColorCompatibility.systemGray5
+        boxCc = VBox()
+        boxSevenDay = VBox()
+        boxHazards = VBox()
+        boxHazards.isHidden = true
+        homePanelRow = HBox(.fillEqually, homeScreenWidgetSpacing)
+        homeLeftPanel = VBox()
+        homeRightPanel = VBox()
+        homeLeftPanel.spacing = homeScreenWidgetSpacing
+        homeRightPanel.spacing = homeScreenWidgetSpacing
+        cardRadar = CardHomeScreen()
+        cardCurrentConditions = nil
+        sevenDayCollection = nil
+        extraDataCards.removeAll()
+        addLocationCard()
+        if homeScreenUsesTwoPanels {
+            setupHomeScreenPanels()
+        }
+        globalHomeScreenRedesign = UIPreferences.homeScreenRedesign
+        globalHomeScreenUsesTwoPanels = homeScreenUsesTwoPanels
+        globalTextViewFontSize = UIPreferences.textviewFontSize
+    }
+
+    private func setupHomeScreenPanels() {
+        homePanelRow.get().translatesAutoresizingMaskIntoConstraints = false
+        homePanelRow.alignment = .top
+        homeLeftPanel.get().translatesAutoresizingMaskIntoConstraints = false
+        homeRightPanel.get().translatesAutoresizingMaskIntoConstraints = false
+        homePanelRow.addLayout(homeLeftPanel)
+        homePanelRow.addLayout(homeRightPanel)
+        boxMain.addLayout(homePanelRow)
+        homePanelRow.get().widthAnchor.constraint(equalTo: boxMain.widthAnchor, constant: -2.0 * homeScreenRedesignInset).isActive = true
+    }
+
+    private func addHomeBox(_ layout: VBox, for favorite: String) {
+        if homeScreenUsesTwoPanels {
+            let panel = homeScreenPanel(for: favorite)
+            panel.addLayout(layout)
+            layout.widthAnchor.constraint(equalTo: panel.widthAnchor).isActive = true
+        } else {
+            boxMain.addLayout(layout)
+            layout.widthAnchor.constraint(equalTo: boxMain.widthAnchor, constant: -2.0 * homeScreenHorizontalPadding).isActive = true
+        }
+        homeScreenWidgetIndex += 1
+    }
+
+    private func addHomeCard(_ card: CardHomeScreen, for favorite: String) {
+        if homeScreenUsesTwoPanels {
+            let panel = homeScreenPanel(for: favorite)
+            panel.addLayout(card)
+            card.setupWithPadding(panel, redesign: UIPreferences.homeScreenRedesign)
+        } else {
+            boxMain.addLayout(card)
+            card.setupWithPadding(
+                boxMain,
+                horizontalPadding: homeScreenHorizontalPadding,
+                redesign: UIPreferences.homeScreenRedesign
+            )
+        }
+        homeScreenWidgetIndex += 1
+    }
+
+    private func homeScreenPanel(for favorite: String) -> VBox {
+        if shouldPlaceInRightPanel(favorite) {
+            return homeRightPanel
+        }
+        return homeLeftPanel
+    }
+
+    private func shouldPlaceInRightPanel(_ favorite: String) -> Bool {
+        if isRightPanelPreferredWidget(favorite) {
+            return true
+        }
+        if homeScreenFavHasRightPanelWidgets {
+            return false
+        }
+        return homeScreenWidgetIndex % 2 == 1
+    }
+
+    private func isRightPanelPreferredWidget(_ favorite: String) -> Bool {
+        favorite == "METAL-RADAR" || favorite.hasPrefix("IMG-")
+    }
+
+    private func homeScreenRadarWidth() -> CGFloat {
+        let (defaultWidth, _) = UtilityUI.getScreenBoundsCGFloat()
+        let baseWidth = view.bounds.width > 0.0 ? view.bounds.width : defaultWidth
+        if homeScreenUsesTwoPanels {
+            return max((baseWidth - (homeScreenRedesignInset * 2.0) - homeScreenRedesignSpacing) / 2.0, 1.0)
+        }
+        if UIPreferences.homeScreenRedesign {
+            return max(baseWidth - (homeScreenRedesignInset * 2.0), 1.0)
+        }
+        return max(baseWidth, 1.0)
     }
 
     func getForecastData() {
@@ -169,7 +295,8 @@ final class VcTabLocation: VcTabParent {
             sevenDayCollection = SevenDayCollection(
                 boxSevenDay,
                 scrollView,
-                sevenDay)
+                sevenDay,
+                useHomeScreenRedesign: UIPreferences.homeScreenRedesign)
             sevenDayCollection?.locationIndex = Location.getCurrentLocation()
         } else {
             sevenDayCollection?.update(sevenDay)
@@ -182,44 +309,31 @@ final class VcTabLocation: VcTabParent {
 
     func updateHazards() {
         boxHazards.removeChildren()
-        CardHazards.get(self, boxHazards, hazards)
-    }
-
-    // Clear all views except 7day and current conditions
-    func clearViews() {
-        boxHazards.removeChildren()
-        extraDataCards.forEach {
-            $0.removeFromSuperview()
-        }
-        extraDataCards.removeAll()
-        boxHazards.isHidden = true
-        cardRadar.removeFromSuperview()
+        CardHazards.get(self, boxHazards, hazards, useHomeScreenRedesign: UIPreferences.homeScreenRedesign)
     }
 
     private func mainDisplay() {
         globalHomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
         let homescreenFav = WString.split(globalHomeScreenFav, ":")
+        homeScreenFavHasRightPanelWidgets = homescreenFav.contains { isRightPanelPreferredWidget($0) }
+        homeScreenWidgetIndex = 0
         textProductLong = [:]
         homescreenFav.forEach { favorite in
             switch favorite {
             case "TXT-CC2":
-                boxMain.addLayout(boxCc)
-                boxCc.constrain(boxMain)
+                addHomeBox(boxCc, for: favorite)
             case "TXT-HAZ":
-                boxMain.addLayout(boxHazards)
-                boxHazards.constrain(boxMain)
+                addHomeBox(boxHazards, for: favorite)
             case "TXT-7DAY2":
-                boxMain.addLayout(boxSevenDay)
-                boxSevenDay.constrain(boxMain)
+                addHomeBox(boxSevenDay, for: favorite)
             case "METAL-RADAR":
                 cardRadar = CardHomeScreen()
-                boxMain.addLayout(cardRadar)
+                addHomeCard(cardRadar, for: favorite)
                 nexradTab.uiv = self
-                nexradTab.getNexradRadar(cardRadar.get())
+                nexradTab.getNexradRadar(cardRadar.get(), width: homeScreenRadarWidth())
             default:
                 let cardHomeScreen = CardHomeScreen()
-                boxMain.addLayout(cardHomeScreen)
-                cardHomeScreen.setup(boxMain)
+                addHomeCard(cardHomeScreen, for: favorite)
                 extraDataCards.append(cardHomeScreen)
                 if favorite.hasPrefix("TXT-") {
                     let product = favorite.replace("TXT-", "")
@@ -267,15 +381,23 @@ final class VcTabLocation: VcTabParent {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(UIPreferences.backButtonAnimation)
         updateColors()
-        locationLabel.text = Location.name
+        updateLocationHeaderText()
         let newhomeScreenFav = Utility.readPref("HOMESCREEN_FAV", GlobalVariables.homescreenFavDefault)
         let textSizeHasChange = abs(UIPreferences.textviewFontSize - globalTextViewFontSize) > 0.5
+        let homeScreenRedesignHasChanged = UIPreferences.homeScreenRedesign != globalHomeScreenRedesign
+        let homeScreenPanelLayoutHasChanged = homeScreenUsesTwoPanels != globalHomeScreenUsesTwoPanels
         Location.checkCurrentLocationValidity()
-        if (Location.latLon != oldLocation) || (newhomeScreenFav != globalHomeScreenFav) || textSizeHasChange || UIPreferences.settingsUIVisitedNeedRefresh {
+        if (Location.latLon != oldLocation)
+            || (newhomeScreenFav != globalHomeScreenFav)
+            || textSizeHasChange
+            || homeScreenRedesignHasChanged
+            || homeScreenPanelLayoutHasChanged
+            || UIPreferences.settingsUIVisitedNeedRefresh {
             UIPreferences.settingsUIVisitedNeedRefresh = false
             scrollView.scrollToTop()
             cardCurrentConditions?.resetTextSize()
             sevenDayCollection?.resetTextSize()
+            locationText.font = FontSize.extraLarge.size
             locationLabel.font = FontSize.extraLarge.size
             getContentSuper()
         }
@@ -284,7 +406,7 @@ final class VcTabLocation: VcTabParent {
     func locationChanged(_ locationNumber: Int) {
         if locationNumber < Location.numLocations {
             Location.setCurrentLocationStr(String(locationNumber + 1))
-            locationLabel.text = Location.name
+            updateLocationHeaderText()
             getContentSuper()
         } else {
             Route.locationAdd(self)
@@ -319,7 +441,11 @@ final class VcTabLocation: VcTabParent {
             let tapOnCC1 = GestureData(self, #selector(ccAction))
             let tapOnCC2 = GestureData(self, #selector(gotoHourly))
             let tapOnCC3 = GestureData(self, #selector(gotoHourly))
-            cardCurrentConditions = CardCurrentConditions(boxCc, currentConditions)
+            cardCurrentConditions = CardCurrentConditions(
+                boxCc,
+                currentConditions,
+                useHomeScreenRedesign: UIPreferences.homeScreenRedesign
+            )
             cardCurrentConditions?.connect(tapOnCC1, tapOnCC2, tapOnCC3)
         } else {
             cardCurrentConditions?.update(currentConditions)
@@ -369,15 +495,81 @@ final class VcTabLocation: VcTabParent {
     }
 
     func addLocationCard() {
-        //
-        // location card loaded regardless of settings
-        //
         let cardLocation = CardHomeScreen()
         boxMain.addLayout(cardLocation)
-        cardLocation.setup(boxMain)
-        locationLabel = Text(cardLocation, Location.name, FontSize.extraLarge.size, ColorCompatibility.highlightText)
-        locationLabel.connect(GestureData(self, #selector(locationAction)))
-        locationLabel.isSelectable = false
+        cardLocation.setup(boxMain, horizontalPadding: homeScreenHorizontalPadding, redesign: false)
+        configureLocationLabel(redesign: UIPreferences.homeScreenRedesign)
+        if UIPreferences.homeScreenRedesign {
+            addCenteredLocationHeader(to: cardLocation)
+        } else {
+            locationText = Text(cardLocation, Location.name, FontSize.extraLarge.size, ColorCompatibility.highlightText)
+            locationText.connect(GestureData(self, #selector(locationAction)))
+            locationText.isSelectable = false
+        }
+    }
+
+    private func configureLocationLabel(redesign: Bool) {
+        locationLabel = UILabelInset()
+        locationLabel.translatesAutoresizingMaskIntoConstraints = false
+        locationLabel.text = Location.name
+        locationLabel.font = FontSize.extraLarge.size
+        locationLabel.textColor = redesign ? ColorCompatibility.label : ColorCompatibility.highlightText
+        locationLabel.textAlignment = redesign ? .center : .left
+        locationLabel.adjustsFontSizeToFitWidth = true
+        locationLabel.minimumScaleFactor = 0.75
+        locationLabel.numberOfLines = 2
+        locationLabel.isUserInteractionEnabled = !redesign
+        locationLabel.accessibilityTraits = .button
+    }
+
+    private func addCenteredLocationHeader(to cardLocation: CardHomeScreen) {
+        locationHeaderView = UIView()
+        locationHeaderView.translatesAutoresizingMaskIntoConstraints = false
+        locationHeaderView.isUserInteractionEnabled = true
+        locationHeaderView.isAccessibilityElement = true
+        locationHeaderView.accessibilityLabel = Location.name
+        locationHeaderView.accessibilityTraits = .button
+        locationHeaderView.addGestureRecognizer(GestureData(self, #selector(locationAction)))
+
+        locationIcon = UIImageView(image: UIImage(systemName: "location.fill")?.withRenderingMode(.alwaysTemplate))
+        locationIcon.translatesAutoresizingMaskIntoConstraints = false
+        locationIcon.tintColor = ColorCompatibility.label
+        locationIcon.contentMode = .scaleAspectFit
+        locationIcon.widthAnchor.constraint(equalToConstant: 24.0).isActive = true
+        locationIcon.heightAnchor.constraint(equalToConstant: 24.0).isActive = true
+
+        let headerStack = UIStackView(arrangedSubviews: [locationIcon, locationLabel])
+        headerStack.translatesAutoresizingMaskIntoConstraints = false
+        headerStack.axis = .horizontal
+        headerStack.alignment = .center
+        headerStack.spacing = 8.0
+        headerStack.isUserInteractionEnabled = false
+        locationHeaderView.addSubview(headerStack)
+        cardLocation.addWidget(locationHeaderView)
+        NSLayoutConstraint.activate([
+            locationHeaderView.widthAnchor.constraint(equalTo: cardLocation.widthAnchor),
+            headerStack.topAnchor.constraint(equalTo: locationHeaderView.topAnchor, constant: 8.0),
+            headerStack.bottomAnchor.constraint(equalTo: locationHeaderView.bottomAnchor, constant: -8.0),
+            headerStack.centerXAnchor.constraint(equalTo: locationHeaderView.centerXAnchor),
+            headerStack.leadingAnchor.constraint(greaterThanOrEqualTo: locationHeaderView.leadingAnchor, constant: 12.0),
+            headerStack.trailingAnchor.constraint(lessThanOrEqualTo: locationHeaderView.trailingAnchor, constant: -12.0)
+        ])
+    }
+
+    private func updateLocationHeaderText() {
+        locationText.text = Location.name
+        locationLabel.text = Location.name
+        locationHeaderView.accessibilityLabel = Location.name
+    }
+
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: nil) { _ in
+            if UIPreferences.homeScreenRedesign {
+                self.scrollView.scrollToTop()
+                self.getContentSuper()
+            }
+        }
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -392,8 +584,11 @@ final class VcTabLocation: VcTabParent {
         #else
         toolbar.setColorToTheme()
         #endif
-        locationLabel.color = ColorCompatibility.highlightText
+        locationText.color = ColorCompatibility.highlightText
+        locationLabel.textColor = UIPreferences.homeScreenRedesign ? ColorCompatibility.label : ColorCompatibility.highlightText
+        locationIcon.tintColor = locationLabel.textColor
         view.backgroundColor = AppColors.primaryBackgroundBlueUIColor
+        boxMain.getView().backgroundColor = UIPreferences.homeScreenRedesign ? AppColors.primaryBackgroundBlueUIColor : ColorCompatibility.systemGray5
         setTabBarColor()
     }
 }

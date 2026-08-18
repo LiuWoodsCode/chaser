@@ -14,16 +14,23 @@ final class SevenDayCollection {
     var locationIndex = 0
     var cardSunRise: CardSunRise?
 
-    init(_ box: VBox, _ scrollView: UIScrollView, _ sevenDay: SevenDay) {
+    init(_ box: VBox, _ scrollView: UIScrollView, _ sevenDay: SevenDay, useHomeScreenRedesign: Bool = false) {
         uiScrollView = scrollView
         let card = CardHomeScreen()
         box.addLayout(card)
-        card.setupWithPadding(box)
+        card.setupWithPadding(box, redesign: useHomeScreenRedesign)
         let days = sevenDay.forecastList
         let daysShort = sevenDay.forecastListCondensed
         days.indices.forEach { index in
             if days[index] != "" {
-                let cardSevenDay = CardSevenDay(card, index, sevenDay.icons, days, daysShort)
+                let cardSevenDay = CardSevenDay(
+                    card,
+                    index,
+                    sevenDay.icons,
+                    days,
+                    daysShort,
+                    useHomeScreenRedesign: useHomeScreenRedesign
+                )
                 cardSevenDay.connect(
                     GestureData(self, #selector(sevenDayAction)),
                     GestureData(self, #selector(sevenDayAction))

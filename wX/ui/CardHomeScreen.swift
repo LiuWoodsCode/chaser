@@ -10,27 +10,34 @@ final class CardHomeScreen: Box {
 
     private let uistackView = UIStackView()
 
-    func setup() {
+    func setup(redesign: Bool = false) {
         uistackView.translatesAutoresizingMaskIntoConstraints = false
         uistackView.autoresizingMask = [UIView.AutoresizingMask.flexibleWidth, UIView.AutoresizingMask.flexibleHeight]
         uistackView.axis = .vertical
         uistackView.alignment = .center
         uistackView.spacing = 0.0
+        applyHomeScreenWidgetStyle(redesign)
     }
 
-    func setup(_ box: Box) {
-        uistackView.widthAnchor.constraint(equalTo: box.widthAnchor).isActive = true
-        setup()
+    func setup(_ box: Box, horizontalPadding: CGFloat = 0.0, redesign: Bool = false) {
+        uistackView.widthAnchor.constraint(equalTo: box.widthAnchor, constant: -2.0 * horizontalPadding).isActive = true
+        setup(redesign: redesign)
     }
 
-    func setupWithPadding() {
-        setup()
+    func setupWithPadding(redesign: Bool = false) {
+        setup(redesign: redesign)
         uistackView.spacing = UIPreferences.stackviewCardSpacing
     }
 
-    func setupWithPadding(_ box: Box) {
-        setup(box)
+    func setupWithPadding(_ box: Box, horizontalPadding: CGFloat = 0.0, redesign: Bool = false) {
+        setup(box, horizontalPadding: horizontalPadding, redesign: redesign)
         uistackView.spacing = UIPreferences.stackviewCardSpacing
+    }
+
+    private func applyHomeScreenWidgetStyle(_ redesign: Bool) {
+        uistackView.backgroundColor = redesign ? ColorCompatibility.systemGray5 : .clear
+        uistackView.layer.cornerRadius = redesign ? 8.0 : 0.0
+        uistackView.layer.masksToBounds = redesign
     }
 
     func addWidget(_ w: UIView) {

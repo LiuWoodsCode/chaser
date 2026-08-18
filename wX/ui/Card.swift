@@ -51,6 +51,12 @@ final class Card: Widget {
         stackView.setCustomSpacing(spacing, after: arrangedSubview)
     }
 
+    func applyHomeScreenWidgetStyle() {
+        stackView.backgroundColor = ColorCompatibility.systemGray5
+        stackView.layer.cornerRadius = 8.0
+        stackView.layer.masksToBounds = true
+    }
+
     var color: UIColor {
         get { stackView.backgroundColor! }
         set { stackView.backgroundColor = newValue }

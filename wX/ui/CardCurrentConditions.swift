@@ -9,12 +9,13 @@ import UIKit
 final class CardCurrentConditions {
 
     private let cardImage: CardImage
-    private let topText = TextLarge(80)
+    private let topText: TextLarge
     private let middleText = TextSmallGray()
     private let condenseScale: CGFloat = 0.50
     private let card: Card
 
-    init(_ box: VBox, _ currentConditions: CurrentConditions) {
+    init(_ box: VBox, _ currentConditions: CurrentConditions, useHomeScreenRedesign: Bool = false) {
+        topText = TextLarge(80, constrainToScreenWidth: !useHomeScreenRedesign)
         if UIPreferences.mainScreenCondense {
             cardImage = CardImage(sizeFactor: condenseScale)
         } else {
@@ -25,6 +26,9 @@ final class CardCurrentConditions {
         topText.isAccessibilityElement = false
         middleText.isAccessibilityElement = false
         card = Card([cardImage.getView(), boxV.get()])
+        if useHomeScreenRedesign {
+            card.applyHomeScreenWidgetStyle()
+        }
         card.isAccessibilityElement = true
         box.addWidget(card)
         card.constrain(box)

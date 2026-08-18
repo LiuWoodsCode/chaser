@@ -9,12 +9,20 @@ import UIKit
 final class CardSevenDay {
 
     private let card: Card
-    private let topText = TextLarge(80)
+    private let topText: TextLarge
     private let bottomText = TextSmallGray()
     private let cardImage: CardImage
     private let condenseScale: CGFloat = 0.50
 
-    init(_ box: CardHomeScreen, _ index: Int, _ urls: [String], _ days: [String], _ daysShort: [String]) {
+    init(
+        _ box: CardHomeScreen,
+        _ index: Int,
+        _ urls: [String],
+        _ days: [String],
+        _ daysShort: [String],
+        useHomeScreenRedesign: Bool = false
+    ) {
+        topText = TextLarge(80, constrainToScreenWidth: !useHomeScreenRedesign)
         if UIPreferences.mainScreenCondense {
             cardImage = CardImage(sizeFactor: condenseScale)
         } else {

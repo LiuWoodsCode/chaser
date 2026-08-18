@@ -10,10 +10,10 @@ final class CardHazards {
 
     private static var uiv: UIViewController?
 
-    static func get(_ uiv: UIViewController, _ box: VBox, _ hazards: Hazards) {
+    static func get(_ uiv: UIViewController, _ box: VBox, _ hazards: Hazards, useHomeScreenRedesign: Bool = false) {
         CardHazards.uiv = uiv
         let card = CardHomeScreen()
-        card.setupWithPadding()
+        card.setupWithPadding(redesign: useHomeScreenRedesign)
         let ids = hazards.data.parseColumn("\"id\": \"(http.*?)\"")
         let hazardTitles = hazards.data.parseColumn("\"event\": \"(.*?)\"")
         hazardTitles.enumerated().forEach { index, hazard in
