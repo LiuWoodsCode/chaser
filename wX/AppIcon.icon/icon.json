@@ -116,6 +116,9 @@
           ],
           "fill-specializations" : [
             {
+              "value" : "system-dark"
+            },
+            {
               "appearance" : "dark",
               "value" : {
                 "linear-gradient" : [
@@ -133,6 +136,10 @@
                   }
                 }
               }
+            },
+            {
+              "appearance" : "tinted",
+              "value" : "system-light"
             }
           ],
           "hidden" : false,
