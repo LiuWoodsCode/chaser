@@ -13,7 +13,7 @@ final class GlobalVariables {
     static let fixedSpace = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.fixedSpace, target: nil, action: nil)
     static let preferences = Preferences()
     static let editor = Editor()
-    static let appName = "wXL23"
+    static let appName = "Chaser"
     static let appCreatorEmail = "joshua.tee@gmail.com"
     static let nwsSPCwebsitePrefix = "https://www.spc.noaa.gov"
     static let nwsWPCwebsitePrefix = "https://www.wpc.ncep.noaa.gov"
