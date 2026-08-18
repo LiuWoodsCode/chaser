@@ -283,6 +283,7 @@
 		03FA10051FD0BE4500FD96C8 /* CardHazard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FA10041FD0BE4500FD96C8 /* CardHazard.swift */; };
 		03FF8F7E21FA72CD00661F78 /* CardSpotter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */; };
 		03FF8F7F21FA72CD00661F78 /* CardSpotterReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */; };
+		978448613034DB4A00FE90DF /* AppIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 978448603034DB4A00FE90DF /* AppIcon.icon */; };
 		97943EC030336E6300BE3934 /* VcSettingsExperimental.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */; };
 		97943EC23033740B00BE3934 /* NexradMapKitBaseLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97943EC13033740B00BE3934 /* NexradMapKitBaseLayer.swift */; };
 		F00399C41DE9F7D6004508FE /* NexradLevel3WindBarbs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */; };
@@ -694,6 +695,7 @@
 		03FA10041FD0BE4500FD96C8 /* CardHazard.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardHazard.swift; sourceTree = "<group>"; };
 		03FF8F7C21FA72CD00661F78 /* CardSpotter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotter.swift; sourceTree = "<group>"; };
 		03FF8F7D21FA72CD00661F78 /* CardSpotterReport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardSpotterReport.swift; sourceTree = "<group>"; };
+		978448603034DB4A00FE90DF /* AppIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = AppIcon.icon; sourceTree = "<group>"; };
 		97943EBF30336E6300BE3934 /* VcSettingsExperimental.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VcSettingsExperimental.swift; sourceTree = "<group>"; };
 		97943EC13033740B00BE3934 /* NexradMapKitBaseLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NexradMapKitBaseLayer.swift; sourceTree = "<group>"; };
 		F00399C31DE9F7D6004508FE /* NexradLevel3WindBarbs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NexradLevel3WindBarbs.swift; sourceTree = "<group>"; };
@@ -988,6 +990,7 @@
 				F09504AE1E152E84008A966E /* wpc */,
 				F0DAD9271DA7011C00C2BD4B /* wX-Bridging-Header.h */,
 				03EE9057234D5F1D002F897F /* wX.entitlements */,
+				978448603034DB4A00FE90DF /* AppIcon.icon */,
 			);
 			path = wX;
 			sourceTree = "<group>";
@@ -1558,6 +1561,7 @@
 				F06DB44C1DA41547005B243A /* colormaprefcodenh.txt in Resources */,
 				F06DB4501DA41547005B243A /* colormaprefnwsd.txt in Resources */,
 				F06DB44A1DA41547005B243A /* colormapbvcod.txt in Resources */,
+				978448613034DB4A00FE90DF /* AppIcon.icon in Resources */,
 				F06DB4521DA41547005B243A /* countyv2.bin in Resources */,
 				F073744C1DC355FC006439F6 /* Shader.fsh in Resources */,
 				F06DB4541DA41547005B243A /* dvn99.bin in Resources */,
@@ -2142,6 +2146,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = wX/wX.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
@@ -2162,6 +2167,7 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "wX/wX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -2169,6 +2175,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = wX/wX.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
@@ -2188,6 +2195,7 @@
 				SWIFT_ENFORCE_EXCLUSIVE_ACCESS = off;
 				SWIFT_OBJC_BRIDGING_HEADER = "wX/wX-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
