@@ -177,7 +177,7 @@ private final class MacToolbarController: NSObject, NSToolbarDelegate {
     private func makeTabItem() -> NSToolbarItem {
         let group = NSToolbarItemGroup(
             itemIdentifier: Identifier.tabs,
-            titles: ["LOCAL", "SPC", "MISC"],
+            titles: ["Local", "SPC", "Misc"],
             selectionMode: .selectOne,
             labels: ["Local", "SPC", "Misc"],
             target: self,
