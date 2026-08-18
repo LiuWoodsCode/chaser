@@ -747,7 +747,7 @@
 		F073744A1DC355FC006439F6 /* Shader.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.fsh; path = Shaders/Shader.fsh; sourceTree = "<group>"; };
 		F073744B1DC355FC006439F6 /* Shader.vsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; name = Shader.vsh; path = Shaders/Shader.vsh; sourceTree = "<group>"; };
 		F07482D31E793E2F0072F96D /* CardHomeScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CardHomeScreen.swift; sourceTree = "<group>"; };
-		F078FE291DA330B7002CCD13 /* wX.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = wX.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F078FE291DA330B7002CCD13 /* Chaser.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chaser.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F078FE2C1DA330B7002CCD13 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F078FE331DA330B7002CCD13 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F078FE351DA330B7002CCD13 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -942,7 +942,7 @@
 		F078FE2A1DA330B7002CCD13 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				F078FE291DA330B7002CCD13 /* wX.app */,
+				F078FE291DA330B7002CCD13 /* Chaser.app */,
 				F078FE3F1DA330B7002CCD13 /* wXTests.xctest */,
 				F078FE4A1DA330B7002CCD13 /* wXUITests.xctest */,
 			);
@@ -1425,9 +1425,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		F078FE281DA330B7002CCD13 /* wX */ = {
+		F078FE281DA330B7002CCD13 /* Chaser */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = F078FE531DA330B7002CCD13 /* Build configuration list for PBXNativeTarget "wX" */;
+			buildConfigurationList = F078FE531DA330B7002CCD13 /* Build configuration list for PBXNativeTarget "Chaser" */;
 			buildPhases = (
 				F078FE251DA330B7002CCD13 /* Sources */,
 				F078FE261DA330B7002CCD13 /* Frameworks */,
@@ -1438,9 +1438,9 @@
 			);
 			dependencies = (
 			);
-			name = wX;
+			name = Chaser;
 			productName = wX;
-			productReference = F078FE291DA330B7002CCD13 /* wX.app */;
+			productReference = F078FE291DA330B7002CCD13 /* Chaser.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F078FE3E1DA330B7002CCD13 /* wXTests */ = {
@@ -1526,7 +1526,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				F078FE281DA330B7002CCD13 /* wX */,
+				F078FE281DA330B7002CCD13 /* Chaser */,
 				F078FE3E1DA330B7002CCD13 /* wXTests */,
 				F078FE491DA330B7002CCD13 /* wXUITests */,
 			);
@@ -1994,12 +1994,12 @@
 /* Begin PBXTargetDependency section */
 		F078FE411DA330B7002CCD13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F078FE281DA330B7002CCD13 /* wX */;
+			target = F078FE281DA330B7002CCD13 /* Chaser */;
 			targetProxy = F078FE401DA330B7002CCD13 /* PBXContainerItemProxy */;
 		};
 		F078FE4C1DA330B7002CCD13 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = F078FE281DA330B7002CCD13 /* wX */;
+			target = F078FE281DA330B7002CCD13 /* Chaser */;
 			targetProxy = F078FE4B1DA330B7002CCD13 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -2265,7 +2265,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		F078FE531DA330B7002CCD13 /* Build configuration list for PBXNativeTarget "wX" */ = {
+		F078FE531DA330B7002CCD13 /* Build configuration list for PBXNativeTarget "Chaser" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F078FE541DA330B7002CCD13 /* Debug */,
