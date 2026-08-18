@@ -20,11 +20,6 @@ final class CustomTabBarVC: UITabBarController, UITabBarControllerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         tabBar.tintColor = .white
-        if let items = tabBar.items {
-            items.forEach {
-                if let image = $0.image { $0.image = image.withRenderingMode(.alwaysOriginal) }
-            }
-        }
         #if targetEnvironment(macCatalyst)
         delegate = self
         tabBar.isHidden = true
@@ -41,6 +36,21 @@ final class CustomTabBarVC: UITabBarController, UITabBarControllerDelegate {
         let tabBarList = [firstViewController, secondViewController, thirdViewController]
         viewControllers = tabBarList
          */
+        configureTabBarItems()
+    }
+
+    private func configureTabBarItems() {
+        let tabImages = [
+            (image: "location", selectedImage: "location.fill"),
+            (image: "exclamationmark.triangle", selectedImage: "exclamationmark.triangle.fill"),
+            (image: "ellipsis.circle", selectedImage: "ellipsis.circle.fill")
+        ]
+
+        tabBar.items?.enumerated().forEach { index, item in
+            guard tabImages.indices.contains(index) else { return }
+            item.image = UIImage(systemName: tabImages[index].image)
+            item.selectedImage = UIImage(systemName: tabImages[index].selectedImage)
+        }
     }
 
     override func viewDidAppear(_ animated: Bool) {
