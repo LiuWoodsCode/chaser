@@ -76,7 +76,7 @@ final class NexradLongPressMenu {
         } else {
             popupButton = nexradSubmenu.siteButton[0]
         }
-        let popUp = PopUp(uiv, popupButton, "", alertMessage)
+        let popUp = PopUp(uiv, popupButton, "", alertMessage, prefersCatalystList: true)
         nearByRadars.forEach { site in
             let bearingToRadar = LatLon.calculateDirection(pointerLocation, site.latLon)
             let radarDescription = "\(site.codeName) \(RadarSites.getName(site.codeName)) \(site.distance) mi \(bearingToRadar)"

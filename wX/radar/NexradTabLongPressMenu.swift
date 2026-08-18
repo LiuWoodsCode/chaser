@@ -49,7 +49,7 @@ final class NexradTabLongPressMenu {
         if nexradStateHS.wxMetal[index]!.state.gpsLocation.latString != "0.0" && nexradStateHS.wxMetal[index]!.state.gpsLocation.lonString != "0.0" {
             alertMessage += GlobalVariables.newline + "GPS: " + nexradStateHS.wxMetal[index]!.state.gpsLocation.prettyPrintNexrad()
         }
-        let popUp = PopUp(uiv, uiv.menuButton, "", alertMessage)
+        let popUp = PopUp(uiv, uiv.menuButton, "", alertMessage, prefersCatalystList: true)
         nearByRadars.forEach { site in
             let radarDescription = site.codeName + " " + RadarSites.getName(site.codeName) + " \(site.distance) mi"
             popUp.add(Action(radarDescription) { self.radarSiteChanged(site.codeName) })

@@ -8,9 +8,17 @@ import UIKit
 
 final class Action {
 
+    let label: String
     let uiAlertAction: UIAlertAction
+    private let fn: () -> Void
 
     init(_ label: String, _ fn: @escaping () -> Void) {
+        self.label = label
+        self.fn = fn
         uiAlertAction = UIAlertAction(label) { _ in fn() }
+    }
+
+    func perform() {
+        fn()
     }
 }
