@@ -14,7 +14,8 @@ final class GlobalVariables {
     static let preferences = Preferences()
     static let editor = Editor()
     static let appName = "Chaser"
-    static let appCreatorEmail = "joshua.tee@gmail.com"
+    static let appCreatorEmail = "dapixelprowler@outlook.com"
+    static let appCreatorEmailOrig = "joshua.tee@gmail.com"
     static let nwsSPCwebsitePrefix = "https://www.spc.noaa.gov"
     static let nwsWPCwebsitePrefix = "https://www.wpc.ncep.noaa.gov"
     static let nwsAWCwebsitePrefix = "https://www.aviationweather.gov"

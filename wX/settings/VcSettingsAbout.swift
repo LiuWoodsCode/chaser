@@ -13,17 +13,24 @@ final class VcSettingsAbout: UIwXViewController {
     private let releaseNotesUrl = "https://gitlab.com/joshua.tee/wxl23/-/tree/master/doc/ChangeLog_User.md"
     private let dataProviderUrl = "https://gitlab.com/joshua.tee/wxl23/-/blob/master/doc/data_sources.md"
     private static let copyright = "©"
-    private let aboutText = GlobalVariables.appName + " is an efficient and configurable method to access weather content from the "
-        + "National Weather Service and NSSL WRF."
-        + " Software is provided \"as is\". Use at your own risk. Use for educational purposes "
-        + "and non-commercial purposes only. Do not use for operational purposes.  "
-        + copyright
-        + "2016-2024 " + GlobalVariables.appCreatorEmail + " . Please report bugs or suggestions "
-        + "via email to me as opposed to app store reviews. "
-        + GlobalVariables.appName + " is bi-licensed under the Mozilla Public License Version 2 as well "
-        + "as the GNU General Public License Version 3 or later. "
-        + "For more information on the licenses please go here: https://www.mozilla.org/en-US/MPL/2.0/"
-        + " and http://www.gnu.org/licenses/gpl-3.0.en.html" + GlobalVariables.newline
+    private let aboutText = """
+    \(GlobalVariables.appName) is an efficient and configurable application for accessing weather content from the National Weather Service and NSSL WRF.
+
+    Software is provided "as is." Use at your own risk. This software is intended for educational and non-commercial purposes only. Do not use it for operational purposes.
+
+    \(copyright) 2026-2026 \(GlobalVariables.appCreatorEmail)
+    
+    \(GlobalVariables.appName) is based on the existing wXL23 application.
+    \(copyright) 2016–2024 \(GlobalVariables.appCreatorEmailOrig)
+
+    Please report bugs or suggestions via email rather than through App Store reviews.
+
+    \(GlobalVariables.appName) is dual-licensed under the Mozilla Public License Version 2.0 and the GNU General Public License Version 3 or later.
+
+    For more information about these licenses, see:
+    https://www.mozilla.org/en-US/MPL/2.0/
+    https://www.gnu.org/licenses/gpl-3.0.en.html
+    """ + GlobalVariables.newline
     private var statusButton = ToolbarIcon()
 
     override func viewDidLoad() {
